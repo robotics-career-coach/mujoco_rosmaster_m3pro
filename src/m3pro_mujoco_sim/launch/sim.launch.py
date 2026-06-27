@@ -1,12 +1,9 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
-import xacro
 
 
 def generate_launch_description():
@@ -14,9 +11,10 @@ def generate_launch_description():
     sim_pkg = get_package_share_directory('m3pro_mujoco_sim')
 
     robot_description_file = os.path.join(
-        description_pkg, 'urdf', 'm3pro_ros2_control.urdf.xacro'
+        description_pkg, 'urdf', 'm3pro.urdf'
     )
-    robot_description_content = xacro.process_file(robot_description_file).toxml()
+    with open(robot_description_file, 'r') as f:
+        robot_description_content = f.read()
 
     mujoco_model_path = os.path.join(description_pkg, 'mjcf', 'm3pro.xml')
     controllers_file = os.path.join(sim_pkg, 'config', 'controllers.yaml')

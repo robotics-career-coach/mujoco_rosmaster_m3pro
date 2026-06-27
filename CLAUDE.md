@@ -36,8 +36,7 @@ Two ROS2 ament_cmake packages, no custom C++ or Python nodes — everything is w
 
 **`m3pro_description`** — Robot model. Contains two parallel representations:
 - `mjcf/m3pro.xml` — The MuJoCo MJCF model used by the physics engine. This is the authoritative simulation model. Meshes are referenced relative to `../meshes/` via the `meshdir` compiler directive.
-- `urdf/m3pro.urdf.xacro` — Simplified URDF for `robot_state_publisher` (TF tree). Not used for physics.
-- `urdf/m3pro_ros2_control.urdf.xacro` — Wraps the URDF and adds `<ros2_control>` tags declaring the `MujocoSystemInterface` hardware plugin with all joint command/state interfaces and IMU sensor interfaces.
+- `urdf/m3pro.urdf` — Plain URDF with `<ros2_control>` tags for `robot_state_publisher` (TF tree) and `MujocoSystemInterface` hardware plugin declaration. Not used for physics. No xacro dependency.
 
 **`m3pro_mujoco_sim`** — Launch files and controller/plugin configs. No code, only YAML and Python launch files.
 
@@ -57,7 +56,7 @@ Wheel joints: `lwheel1_joint` (FL), `rwheel1_joint` (FR), `lwheel2_joint` (RL), 
 Arm joints: `arm1_joint` through `arm5_joint`
 Gripper: `rlink1_joint` (primary), `llink1_joint`, `rlink2_joint`, `llink2_joint`, `rlink3_joint`, `llink3_joint` (coupled via equality constraints)
 
-These names must match across `m3pro.xml`, `m3pro_ros2_control.urdf.xacro`, and `controllers.yaml`.
+These names must match across `m3pro.xml`, `m3pro.urdf`, and `controllers.yaml`.
 
 ## Files in urdf/ (Root)
 

@@ -2,16 +2,16 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-import xacro
 
 
 def generate_launch_description():
     description_pkg = get_package_share_directory('m3pro_description')
 
     robot_description_file = os.path.join(
-        description_pkg, 'urdf', 'm3pro.urdf.xacro'
+        description_pkg, 'urdf', 'm3pro.urdf'
     )
-    robot_description_content = xacro.process_file(robot_description_file).toxml()
+    with open(robot_description_file, 'r') as f:
+        robot_description_content = f.read()
 
     rviz_config = os.path.join(description_pkg, 'rviz', 'm3pro.rviz')
 

@@ -1,0 +1,143 @@
+<mujoco model="M3Pro">
+<compiler angle="radian"/>
+<option timestep="0.002" gravity="0 0 -9.81"/>
+<visual>
+<global azimuth="135" elevation="-25"/>
+<quality shadowsize="2048"/>
+</visual>
+<default>
+<geom contype="1" conaffinity="1" condim="3" friction="1 0.1 0.1"/>
+<joint damping="1" armature="0.01"/>
+</default>
+<asset>
+<mesh name="base_link" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/base_link.stl" scale="1 1 1"/>
+<mesh name="arm1" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/arm1.stl" scale="1 1 1"/>
+<mesh name="arm2" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/arm2.stl" scale="1 1 1"/>
+<mesh name="arm3" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/arm3.stl" scale="1 1 1"/>
+<mesh name="arm4" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/arm4.stl" scale="1 1 1"/>
+<mesh name="arm5" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/arm5.stl" scale="1 1 1"/>
+<mesh name="rlink1" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/rlink1.stl" scale="1 1 1"/>
+<mesh name="rlink2" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/rlink2.stl" scale="1 1 1"/>
+<mesh name="llink1" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/llink1.stl" scale="1 1 1"/>
+<mesh name="llink2" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/llink2.stl" scale="1 1 1"/>
+<mesh name="rlink3" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/rlink3.stl" scale="1 1 1"/>
+<mesh name="llink3" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/llink3.stl" scale="1 1 1"/>
+<mesh name="Gripping" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/Gripping.stl" scale="1 1 1"/>
+<mesh name="DCW2" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/DCW2.stl" scale="1 1 1"/>
+<mesh name="Camera" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/Camera.stl" scale="1 1 1"/>
+<mesh name="lwheel1" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/lwheel1.stl" scale="1 1 1"/>
+<mesh name="lwheel2" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/lwheel2.stl" scale="1 1 1"/>
+<mesh name="rwheel1" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/rwheel1.stl" scale="1 1 1"/>
+<mesh name="rwheel2" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/rwheel2.stl" scale="1 1 1"/>
+<mesh name="arm_base_Link" content_type="model/stl" file="C:/Users/Alex/Desktop/yahboom_M3Pro_description/yahboom_M3Pro_description/meshes/arm_base_Link.stl" scale="1 1 1"/>
+</asset>
+<worldbody>
+<light name="top_light" pos="0 0 2" dir="0 0 -1" diffuse="1 1 1" specular="0.2 0.2 0.2"/>
+<camera name="main_camera" pos="0.6 -0.8 0.45" xyaxes="0.8 0.6 0 -0.25 0.33 0.91"/>
+<geom name="floor" type="plane" pos="0 0 -0.01" size="2 2 0.05" rgba="0.8 0.8 0.8 1" friction="1 0.1 0.1"/>
+<body name="sock" pos="0.20 0.00 0.002">
+  <freejoint name="sock_freejoint"/>
+  <geom name="sock_geom"
+        type="box"
+        size="0.06 0.025 0.012"
+        mass="0.03"
+        rgba="1 0.05 0.02 1"
+        friction="1.2 0.1 0.1"/>
+</body>
+<geom type="mesh" rgba="0.501961 0.501961 0.501961 1" mesh="base_link"/>
+<geom pos="0.033617 -1.0031e-05 0" quat="1 3.18755e-05 0 0" type="mesh" rgba="0 0.627451 0.235294 1" mesh="arm_base_Link"/>
+<body name="arm1" pos="0.033617 -1.2421e-05 0.185" quat="0.999899 3.18723e-05 4.52537e-07 0.014197">
+<inertial pos="2.13577e-05 -2.28858e-05 0.0108851" quat="0.507061 0.492834 -0.507065 0.492837" mass="0.0244386" diaginertia="6.04484e-06 4.13129e-06 3.52353e-06"/>
+<joint name="arm1_Joint" pos="0 0 0" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.776471 0.756863 0.737255 1" mesh="arm1"/>
+<body name="arm2" pos="-0.0021522 6.1185e-05 0.033" quat="0.999899 -3.18593e-05 4.52783e-07 -0.0142105">
+<inertial pos="-0.000602027 -9.27558e-05 0.0264033" quat="0.999996 0.00268868 -5.30374e-09 1.97261e-06" mass="0.0614987" diaginertia="2.10648e-05 1.64231e-05 9.72268e-06"/>
+<joint name="arm2_Joint" pos="0 0 0" axis="0 -1 -6.3725e-05" range="-1.5708 1.5708" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="arm2"/>
+<body name="arm3" pos="0 0 0.08285" quat="0.999908 3.18481e-05 4.316e-07 0.0135506">
+<inertial pos="-0.000604374 -7.46162e-05 0.0258333" quat="0.999905 0.00265655 -3.59956e-05 -0.0135485" mass="0.0614987" diaginertia="2.10648e-05 1.64231e-05 9.72268e-06"/>
+<joint name="arm3_Joint" pos="0 0 0" axis="-0.0270981 -0.999633 0" range="-1.5708 1.5708" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="arm3"/>
+<body name="arm4" pos="0 0 0.08285" quat="0.999908 0 0 -0.0135371">
+<inertial pos="-0.0169016 -0.0266822 0.021036" quat="0.568085 0.47078 -0.657604 0.152324" mass="0.129584" diaginertia="0.000293327 0.000282116 3.9274e-05"/>
+<joint name="arm4_Joiint" pos="0 0 0" axis="-2.6392e-05 -1 0" range="-1.5708 1.5708" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="arm4"/>
+<geom pos="-0.0483883 0.0024518 0.06719" quat="0.707036 0.010039 -0.707036 0.010039" type="mesh" rgba="0.203922 0.203922 0.203922 1" mesh="DCW2"/>
+<body name="arm5" pos="0.00057305 0 0.074815">
+<inertial pos="-0.000112121 -0.0237374 0.0199051" quat="0.502152 0.780576 -0.0660057 -0.366317" mass="0.0532981" diaginertia="0.000158242 0.00015769 6.65821e-06"/>
+<joint name="arm5_Joint" pos="0 0 0" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.203922 0.203922 0.203922 1" mesh="arm5"/>
+<geom pos="-0.00062499 0.00023987 0.093235" quat="0.707105 -1.0199e-05 -0.707108 -1.03071e-05" type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="Gripping"/>
+<body name="rlink1" pos="-0.0047503 -0.012625 0.029275" quat="0.6261 0.328628 -0.626103 -0.328628">
+<inertial pos="0.00808925 0.000355297 -0.000464636" quat="0.0153277 0.706941 -0.0153277 0.706941" mass="0.00469662" diaginertia="5.45545e-07 4.53632e-07 1.01494e-07"/>
+<joint name="rlink1_Joint" pos="0 0 0" axis="0 0 -1" range="-0.95 0" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="rlink1"/>
+<body name="rlink2" pos="0.03 0 0.001" quat="0.885443 0 0 0.464748">
+<inertial pos="0.0225651 0.00616269 -0.005" quat="-0.0583348 0.704696 0.0583348 0.704696" mass="0.00614487" diaginertia="1.57602e-06 1.5385e-06 4.67285e-08"/>
+<joint name="rlink2_Joint" pos="0 0 0" axis="0 0 1"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="rlink2"/>
+</body>
+</body>
+<body name="llink1" pos="-0.0044997 0.012375 0.029275" quat="0.625951 -0.328913 -0.625953 0.328913">
+<inertial pos="0.00884603 -0.000341813 -0.000169456" quat="-0.0125905 0.706995 0.0125905 0.706995" mass="0.00426701" diaginertia="5.36665e-07 4.55978e-07 8.7967e-08"/>
+<joint name="llink1_Joint" pos="0 0 0" axis="0 0 1" range="0 0.95" actuatorfrcrange="-100 100"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="llink1"/>
+<body name="llink2" pos="0.03 0 0.00125" quat="0.885229 0 0 -0.465155">
+<inertial pos="0.0226281 -0.00592712 -0.00525" quat="0.0546608 0.704991 -0.0546608 0.704991" mass="0.00614487" diaginertia="1.57602e-06 1.5385e-06 4.67285e-08"/>
+<joint name="llink2_Joint" pos="0 0 0" axis="0 0 1"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="llink2"/>
+</body>
+</body>
+<body name="rlink3" pos="-0.0045001 -0.0044999 0.047275" quat="0.627495 0.325958 -0.627497 -0.325958">
+<inertial pos="0.0147913 -6.00954e-09 -0.0027141" quat="0.5 0.5 0.5 0.5" mass="0.00270972" diaginertia="1.63608e-07 1.63255e-07 9.18475e-09"/>
+<joint name="rlink3_Joint" pos="0 0 0" axis="0 0 1"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="rlink3"/>
+                <geom name="right_finger_pad" type="box" pos="0.025 0 -0.003" size="0.018 0.006 0.006" rgba="0.05 0.05 0.05 0.35" friction="2.0 0.5 0.5" mass="0.001"/>
+</body>
+<body name="llink3" pos="-0.0044999 0.0045001 0.047275" quat="0.62791 -0.325158 -0.627912 0.325158">
+<inertial pos="0.0147913 0 -0.0027141" quat="0.5 0.5 0.5 0.5" mass="0.00270972" diaginertia="1.63608e-07 1.63255e-07 9.18475e-09"/>
+<joint name="llink3_Joint" pos="0 0 0" axis="0 0 1"/>
+<geom type="mesh" rgba="0.898039 0.917647 0.929412 1" mesh="llink3"/>
+                <geom name="left_finger_pad" type="box" pos="0.025 0 -0.003" size="0.018 0.006 0.006" rgba="0.05 0.05 0.05 0.35" friction="2.0 0.5 0.5" mass="0.001"/>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+<body name="Camera" pos="0.0909155 0.000198272 0.0934842" quat="0.707107 0.707107 0 0">
+<inertial pos="-0.00515993 0.0171563 -5.08017e-05" quat="0.747845 0.000570843 0.000569724 0.663873" mass="0.0538583" diaginertia="3.1028e-05 3.00023e-05 5.78326e-06"/>
+<joint name="Camera_Joint" pos="0 0 0" axis="0 0 -1"/>
+<geom type="mesh" rgba="0.501961 0.501961 0.501961 1" mesh="Camera"/>
+</body>
+<body name="lwheel1" pos="0.0775754 0.09775 0.04" quat="0.707107 0.707107 0 0">
+<inertial pos="-2.05401e-06 1.73799e-06 0.0108533" quat="0.561865 0.429359 -0.561826 0.429314" mass="0.0973137" diaginertia="7.45963e-05 4.45246e-05 4.45241e-05"/>
+<joint name="lwheel1_Joint" pos="0 0 0" axis="0 0 -1"/>
+<geom type="mesh" rgba="0.298039 0.298039 0.298039 1" mesh="lwheel1"/>
+</body>
+<body name="lwheel2" pos="-0.0814246 0.09775 0.0399977" quat="0.707107 0.707107 0 0">
+<inertial pos="2.42861e-06 -1.02167e-06 0.0108534" quat="0.34669 0.616262 -0.346669 0.616318" mass="0.0973122" diaginertia="7.45957e-05 4.45243e-05 4.45231e-05"/>
+<joint name="lwheel2_Joint" pos="0 0 0" axis="0 0 -1"/>
+<geom type="mesh" rgba="0.298039 0.298039 0.298039 1" mesh="lwheel2"/>
+</body>
+<body name="rwheel1" pos="0.0775754 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+<inertial pos="2.6239e-07 -2.6217e-06 0.0108534" quat="0.616844 0.345718 -0.616796 0.345753" mass="0.097312" diaginertia="7.45956e-05 4.45242e-05 4.45231e-05"/>
+<joint name="rwheel1_Joint" pos="0 0 0" axis="0 0 -1"/>
+<geom type="mesh" rgba="0.298039 0.298039 0.298039 1" mesh="rwheel1"/>
+</body>
+<body name="rwheel2" pos="-0.0814246 -0.09775 0.0399977" quat="0.707107 -0.707107 0 0">
+<inertial pos="-2.69134e-06 -2.97756e-07 0.0108533" quat="0.338029 0.621105 -0.337976 0.621078" mass="0.0973137" diaginertia="7.45963e-05 4.45246e-05 4.45241e-05"/>
+<joint name="rwheel2_Joint" pos="0 0 0" axis="0 0 -1"/>
+<geom type="mesh" rgba="0.298039 0.298039 0.298039 1" mesh="rwheel2"/>
+</body>
+</worldbody>
+<actuator>
+<position name="arm1_motor" joint="arm1_Joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+<position name="arm2_motor" joint="arm2_Joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+<position name="arm3_motor" joint="arm3_Joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+<position name="arm4_motor" joint="arm4_Joiint" kp="20" ctrlrange="-1.5708 1.5708"/>
+<position name="arm5_motor" joint="arm5_Joint" kp="20" ctrlrange="-1.5708 1.5708"/>
+<position name="rlink1_motor" joint="rlink1_Joint" kp="25" ctrlrange="-0.95 0"/>
+<position name="llink1_motor" joint="llink1_Joint" kp="25" ctrlrange="0 0.95"/>
+</actuator>
+</mujoco>

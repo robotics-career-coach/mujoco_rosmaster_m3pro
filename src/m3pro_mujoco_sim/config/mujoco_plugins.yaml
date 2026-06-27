@@ -1,0 +1,37 @@
+# Sensor plugin configuration for mujoco_ros2_control
+
+mujoco_ros2_control:
+  ros__parameters:
+    # Camera plugin
+    plugins:
+      - depth_camera_plugin
+      - lidar_front_plugin
+      - lidar_rear_plugin
+
+    depth_camera_plugin:
+      type: mujoco_ros2_control_plugins/CameraPlugin
+      camera_name: depth_camera_rgb
+      frame_id: camera_color_optical_frame
+      image_topic: /depth_camera/color/image_raw
+      camera_info_topic: /depth_camera/color/camera_info
+      depth_camera_name: depth_camera_depth
+      depth_topic: /depth_camera/depth/image_raw
+      publish_rate: 6.0
+
+    lidar_front_plugin:
+      type: mujoco_ros2_control_plugins/RangefinderLidarPlugin
+      frame_id: lidar_front_link
+      scan_topic: /lidar_front/scan
+      site_prefix: lidar_front
+      publish_rate: 5.0
+      range_min: 0.05
+      range_max: 12.0
+
+    lidar_rear_plugin:
+      type: mujoco_ros2_control_plugins/RangefinderLidarPlugin
+      frame_id: lidar_rear_link
+      scan_topic: /lidar_rear/scan
+      site_prefix: lidar_rear
+      publish_rate: 5.0
+      range_min: 0.05
+      range_max: 12.0

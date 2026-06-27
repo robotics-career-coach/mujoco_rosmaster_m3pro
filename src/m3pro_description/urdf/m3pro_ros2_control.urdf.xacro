@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="m3pro">
+
+  <!-- Load the base URDF -->
+  <xacro:include filename="$(find m3pro_description)/urdf/m3pro.urdf.xacro"/>
+
+  <!-- ros2_control hardware interface for MuJoCo -->
+  <ros2_control name="mujoco_ros2_control" type="system">
+    <hardware>
+      <plugin>mujoco_ros2_control/MujocoSystemInterface</plugin>
+    </hardware>
+
+    <!-- Wheel joints: velocity command, position+velocity state -->
+    <joint name="lwheel1_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rwheel1_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="lwheel2_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rwheel2_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- Arm joints: position command, position+velocity state -->
+    <joint name="arm1_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="arm2_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="arm3_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="arm4_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="arm5_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- Gripper joint -->
+    <joint name="rlink1_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- IMU sensor -->
+    <sensor name="imu_sensor">
+      <state_interface name="orientation.x"/>
+      <state_interface name="orientation.y"/>
+      <state_interface name="orientation.z"/>
+      <state_interface name="orientation.w"/>
+      <state_interface name="angular_velocity.x"/>
+      <state_interface name="angular_velocity.y"/>
+      <state_interface name="angular_velocity.z"/>
+      <state_interface name="linear_acceleration.x"/>
+      <state_interface name="linear_acceleration.y"/>
+      <state_interface name="linear_acceleration.z"/>
+    </sensor>
+  </ros2_control>
+
+</robot>

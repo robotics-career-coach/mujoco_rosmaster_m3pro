@@ -1,2 +1,7 @@
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Ignore ROS build directories
+build/
+install/
+log/

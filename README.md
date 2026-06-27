@@ -1,4 +1,4 @@
-# MuJoCo Simulation — Yahboom ROSMASTER M3 Pro
+# Yahboom ROSMASTER M3 Pro MuJoCo Simulation 
 
 MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yahboom.net/products/rosmaster-m3-pro) robot with ROS2 Jazzy integration via `ros2_control`. The simulation publishes sensor data and accepts velocity commands on standard ROS topics, enabling development of navigation, perception, and control algorithms without the physical robot.
 

@@ -1,0 +1,53 @@
+{
+  "name": "ROSMASTER M3 Pro MuJoCo Sim",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/mujoco_rosmaster_m3pro,type=bind",
+  "workspaceFolder": "/workspaces/mujoco_rosmaster_m3pro",
+
+  "remoteEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+    "XDG_RUNTIME_DIR": "${localEnv:XDG_RUNTIME_DIR}",
+    "LIBGL_ALWAYS_SOFTWARE": "1"
+  },
+
+  "runArgs": [
+    "--network=host",
+    "--ipc=host",
+    "--privileged"
+  ],
+
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.Xauthority,target=/home/dev/.Xauthority,type=bind,consistency=cached"
+  ],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "smilerobotics.urdf"
+      ],
+      "settings": {
+        "ros.distro": "humble",
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.associations": {
+          "*.xacro": "xml",
+          "*.urdf": "xml",
+          "*.launch.py": "python"
+        }
+      }
+    }
+  },
+
+  "postCreateCommand": "sudo chown -R dev:dev /workspaces/mujoco_rosmaster_m3pro && source /opt/ros/humble/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release",
+
+  "remoteUser": "dev"
+}

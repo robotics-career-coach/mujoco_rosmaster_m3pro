@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Publishes MJCF XML to /mujoco_robot_description for mujoco_ros2_control."""
+import os
+import re
+import sys
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import QoSProfile, DurabilityPolicy, HistoryPolicy
+from std_msgs.msg import String
+
+
+class MjcfPublisher(Node):
+    def __init__(self):
+        super().__init__('mjcf_description_publisher')
+
+        self.declare_parameter('mjcf_path', '')
+        mjcf_path = self.get_parameter('mjcf_path').get_parameter_value().string_value
+
+        if not mjcf_path:
+            self.get_logger().fatal('mjcf_path parameter is required')
+            sys.exit(1)
+
+        try:
+            with open(mjcf_path, 'r') as f:
+                mjcf_content = f.read()
+        except OSError as e:
+            self.get_logger().fatal(f'Cannot read MJCF file: {e}')
+            sys.exit(1)
+
+        # MuJoCo has no file path anchor when loading from a string, so relative
+        # meshdir/assetdir values fail. Rewrite them to absolute paths.
+        mjcf_dir = os.path.dirname(os.path.abspath(mjcf_path))
+
+        def abs_attr(match):
+            attr, rel = match.group(1), match.group(2)
+            abs_path = os.path.normpath(os.path.join(mjcf_dir, rel))
+            return f'{attr}="{abs_path}"'
+
+        mjcf_content = re.sub(
+            r'(meshdir|assetdir)="([^"]+)"', abs_attr, mjcf_content
+        )
+
+        # Latching QoS — new subscribers receive the last message immediately
+        qos = QoSProfile(
+            depth=1,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+        )
+
+        self.pub = self.create_publisher(String, '/mujoco_robot_description', qos)
+        msg = String()
+        msg.data = mjcf_content
+        self.pub.publish(msg)
+        self.get_logger().info(f'Published MJCF from {mjcf_path}')
+
+
+def main():
+    rclpy.init()
+    node = MjcfPublisher()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

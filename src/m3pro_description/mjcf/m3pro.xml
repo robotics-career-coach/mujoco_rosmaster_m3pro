@@ -1,0 +1,337 @@
+<mujoco model="m3pro">
+  <compiler angle="radian" meshdir="../meshes"/>
+
+  <option timestep="0.002" gravity="0 0 -9.81" cone="elliptic"/>
+
+  <visual>
+    <global azimuth="135" elevation="-25"/>
+    <quality shadowsize="2048"/>
+  </visual>
+
+  <default>
+    <geom contype="1" conaffinity="1"/>
+    <joint damping="0.5" armature="0.01"/>
+
+    <default class="visual">
+      <geom contype="0" conaffinity="0" group="1"/>
+    </default>
+
+    <default class="collision">
+      <geom group="3" rgba="0.5 0.5 0.5 0.3"/>
+    </default>
+  </default>
+
+  <asset>
+    <texture type="2d" name="groundplane" builtin="checker" rgb1="0.55 0.55 0.55" rgb2="0.65 0.65 0.65" width="512" height="512" mark="edge" markrgb="0.5 0.5 0.5"/>
+    <material name="groundplane" texture="groundplane" texrepeat="5 5" texuniform="true" reflectance="0.05"/>
+
+    <material name="black_aluminum" rgba="0.2 0.2 0.22 1" specular="0.6" shininess="0.3" reflectance="0.08"/>
+    <material name="green_pcb" rgba="0.0 0.5 0.18 1" specular="0.3" shininess="0.2"/>
+    <material name="black_rubber" rgba="0.22 0.22 0.22 1" specular="0.1" shininess="0.05"/>
+    <material name="blue_servo" rgba="0.15 0.35 0.7 1" specular="0.5" shininess="0.4"/>
+    <material name="silver_bracket" rgba="0.75 0.75 0.78 1" specular="0.7" shininess="0.5" reflectance="0.1"/>
+    <material name="dark_plastic" rgba="0.18 0.18 0.18 1" specular="0.3" shininess="0.2"/>
+    <material name="camera_body" rgba="0.22 0.22 0.24 1" specular="0.4" shininess="0.3"/>
+
+    <mesh name="base_link" file="base_link.stl"/>
+    <mesh name="arm_base_Link" file="arm_base_Link.stl"/>
+    <mesh name="arm1" file="arm1.stl"/>
+    <mesh name="arm2" file="arm2.stl"/>
+    <mesh name="arm3" file="arm3.stl"/>
+    <mesh name="arm4" file="arm4.stl"/>
+    <mesh name="arm5" file="arm5.stl"/>
+    <mesh name="rlink1" file="rlink1.stl"/>
+    <mesh name="rlink2" file="rlink2.stl"/>
+    <mesh name="llink1" file="llink1.stl"/>
+    <mesh name="llink2" file="llink2.stl"/>
+    <mesh name="rlink3" file="rlink3.stl"/>
+    <mesh name="llink3" file="llink3.stl"/>
+    <mesh name="Gripping" file="Gripping.stl"/>
+    <mesh name="DCW2" file="DCW2.stl"/>
+    <mesh name="Camera" file="Camera.stl"/>
+    <mesh name="lwheel1" file="lwheel1.stl"/>
+    <mesh name="lwheel2" file="lwheel2.stl"/>
+    <mesh name="rwheel1" file="rwheel1.stl"/>
+    <mesh name="rwheel2" file="rwheel2.stl"/>
+  </asset>
+
+  <worldbody>
+    <light name="top_light" pos="0 0 3" dir="0 0 -1" diffuse="0.9 0.9 0.9" specular="0.4 0.4 0.4" castshadow="true"/>
+    <light name="side_light" pos="2 -2 2" dir="-1 1 -1" diffuse="0.5 0.5 0.5" specular="0.2 0.2 0.2"/>
+    <light name="fill_light" pos="-2 2 2" dir="1 -1 -1" diffuse="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
+    <camera name="tracking" pos="0.6 -0.8 0.5" xyaxes="0.8 0.6 0 -0.25 0.33 0.91" mode="trackcom"/>
+
+    <geom name="ground" type="plane" size="5 5 0.1" material="groundplane"
+          condim="4" friction="1.0 0.5 0.01"/>
+
+    <!-- ==================== Robot Base ==================== -->
+    <body name="base_link" pos="0 0 0.042">
+      <freejoint name="base_freejoint"/>
+      <inertial pos="-0.0231 -0.000624 0.0924" mass="0.871"
+                diaginertia="0.000965 0.000924 0.00167"/>
+
+      <geom name="base_visual" type="mesh" mesh="base_link" class="visual"
+            material="black_aluminum"/>
+      <geom name="base_collision" type="box" class="collision"
+            pos="-0.005 0 0.09" size="0.12 0.09 0.06"/>
+
+      <geom name="arm_base_visual" type="mesh" mesh="arm_base_Link" class="visual"
+            pos="0.033617 -1.0031e-05 0" quat="1 3.18755e-05 0 0"
+            material="green_pcb"/>
+
+      <!-- IMU sensor site -->
+      <site name="imu_site" pos="0 0 0.07" size="0.005" rgba="1 0 0 0.5"/>
+
+      <!-- ==================== Mecanum Wheels ==================== -->
+      <!--
+        Wheel layout (top-down, +X is front):
+          lwheel1 (FL)  ___  rwheel1 (FR)
+                       |   |
+          lwheel2 (RL)  ---  rwheel2 (RR)
+
+        Mecanum X-pattern via anisotropic friction (condim=4, elliptic cone).
+      -->
+
+      <!-- Front-left wheel -->
+      <body name="lwheel1" pos="0.0775754 0.09775 0.04" quat="0.707107 0.707107 0 0">
+        <inertial pos="0 0 0.0109" mass="0.0973"
+                  diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+        <joint name="lwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+        <geom name="lwheel1_visual" type="mesh" mesh="lwheel1" class="visual"
+              material="black_rubber"/>
+        <geom name="lwheel1_collision" type="cylinder" size="0.04 0.0275"
+              pos="0 0 0.0109" class="collision"
+              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+      </body>
+
+      <!-- Front-right wheel -->
+      <body name="rwheel1" pos="0.0775754 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+        <inertial pos="0 0 0.0109" mass="0.0973"
+                  diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+        <joint name="rwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+        <geom name="rwheel1_visual" type="mesh" mesh="rwheel1" class="visual"
+              material="black_rubber"/>
+        <geom name="rwheel1_collision" type="cylinder" size="0.04 0.0275"
+              pos="0 0 0.0109" class="collision"
+              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+      </body>
+
+      <!-- Rear-left wheel -->
+      <body name="lwheel2" pos="-0.0814246 0.09775 0.04" quat="0.707107 0.707107 0 0">
+        <inertial pos="0 0 0.0109" mass="0.0973"
+                  diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+        <joint name="lwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+        <geom name="lwheel2_visual" type="mesh" mesh="lwheel2" class="visual"
+              material="black_rubber"/>
+        <geom name="lwheel2_collision" type="cylinder" size="0.04 0.0275"
+              pos="0 0 0.0109" class="collision"
+              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+      </body>
+
+      <!-- Rear-right wheel -->
+      <body name="rwheel2" pos="-0.0814246 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+        <inertial pos="0 0 0.0109" mass="0.0973"
+                  diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+        <joint name="rwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+        <geom name="rwheel2_visual" type="mesh" mesh="rwheel2" class="visual"
+              material="black_rubber"/>
+        <geom name="rwheel2_collision" type="cylinder" size="0.04 0.0275"
+              pos="0 0 0.0109" class="collision"
+              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+      </body>
+
+      <!-- ==================== Depth Camera ==================== -->
+      <body name="camera_link" pos="0.0909155 0.000198 0.0935" quat="0.707107 0.707107 0 0">
+        <inertial pos="-0.00516 0.01716 0" mass="0.054"
+                  diaginertia="3.1e-05 3.0e-05 5.8e-06"/>
+        <geom name="camera_visual" type="mesh" mesh="Camera" class="visual"
+              material="camera_body"/>
+        <camera name="depth_camera_rgb" pos="0 0.025 0" quat="0.5 0.5 -0.5 0.5"
+                fovy="58" resolution="640 480"/>
+        <camera name="depth_camera_depth" pos="0 0.025 0" quat="0.5 0.5 -0.5 0.5"
+                fovy="58" resolution="640 480"/>
+      </body>
+
+      <!-- ==================== 6-DOF Arm ==================== -->
+      <body name="arm1" pos="0.033617 -1.2421e-05 0.185" quat="0.999899 3.18723e-05 4.52537e-07 0.014197">
+        <inertial pos="2.14e-05 -2.29e-05 0.0109" quat="0.507 0.493 -0.507 0.493"
+                  mass="0.0244" diaginertia="6.04e-06 4.13e-06 3.52e-06"/>
+        <joint name="arm1_joint" axis="0 0 1" range="-1.5708 1.5708" damping="1.0" armature="0.01"/>
+        <geom name="arm1_visual" type="mesh" mesh="arm1" class="visual"
+              material="blue_servo"/>
+        <geom name="arm1_collision" type="cylinder" class="collision"
+              pos="0 0 0.015" size="0.02 0.015"/>
+
+        <body name="arm2" pos="-0.0021522 6.1185e-05 0.033" quat="0.999899 -3.18593e-05 4.52783e-07 -0.0142105">
+          <inertial pos="-0.0006 -9.3e-05 0.0264" quat="1 0.00269 0 0"
+                    mass="0.0615" diaginertia="2.11e-05 1.64e-05 9.72e-06"/>
+          <joint name="arm2_joint" axis="0 -1 -6.3725e-05" range="-1.5708 1.5708" damping="1.0" armature="0.01"/>
+          <geom name="arm2_visual" type="mesh" mesh="arm2" class="visual"
+                material="silver_bracket"/>
+          <geom name="arm2_collision" type="capsule" class="collision"
+                pos="0 0 0.04" size="0.015 0.04"/>
+
+          <body name="arm3" pos="0 0 0.08285" quat="0.999908 3.18481e-05 4.316e-07 0.0135506">
+            <inertial pos="-0.0006 -7.5e-05 0.0258" quat="1 0.00266 0 -0.01355"
+                      mass="0.0615" diaginertia="2.11e-05 1.64e-05 9.72e-06"/>
+            <joint name="arm3_joint" axis="-0.027 -0.9996 0" range="-1.5708 1.5708" damping="1.0" armature="0.01"/>
+            <geom name="arm3_visual" type="mesh" mesh="arm3" class="visual"
+                  material="silver_bracket"/>
+            <geom name="arm3_collision" type="capsule" class="collision"
+                  pos="0 0 0.04" size="0.015 0.04"/>
+
+            <body name="arm4" pos="0 0 0.08285" quat="0.999908 0 0 -0.0135371">
+              <inertial pos="0.00266 -5.5e-05 0.0318" mass="0.0797"
+                        diaginertia="1.97e-05 1.75e-05 1.24e-05"/>
+              <joint name="arm4_joint" axis="-2.64e-05 -1 0" range="-1.5708 1.5708" damping="0.5" armature="0.01"/>
+              <geom name="arm4_visual" type="mesh" mesh="arm4" class="visual"
+                    material="blue_servo"/>
+              <geom name="dcw2_visual" type="mesh" mesh="DCW2" class="visual"
+                    pos="-0.0484 0.00245 0.0672" quat="0.707 0.01 -0.707 0.01"
+                    material="dark_plastic"/>
+
+              <body name="arm5" pos="0.00057305 0 0.074815">
+                <inertial pos="0.0186 -0.00247 0.0265" mass="0.0410"
+                          diaginertia="5.48e-06 5.25e-06 1.91e-06"/>
+                <joint name="arm5_joint" axis="0 0 1" range="-1.5708 1.5708" damping="0.5" armature="0.01"/>
+                <geom name="arm5_visual" type="mesh" mesh="arm5" class="visual"
+                      material="blue_servo"/>
+                <geom name="gripping_visual" type="mesh" mesh="Gripping" class="visual"
+                      pos="-0.000625 0.00024 0.093235"
+                      quat="0.707105 -1.02e-05 -0.707108 -1.03e-05"
+                      material="silver_bracket"/>
+
+                <!-- Gripper right finger -->
+                <body name="rlink1" pos="-0.0047503 -0.012625 0.029275" quat="0.6261 0.328628 -0.626103 -0.328628">
+                  <inertial pos="0.00809 0.000355 -0.000465" mass="0.00470"
+                            diaginertia="5.46e-07 4.54e-07 1.01e-07"/>
+                  <joint name="rlink1_joint" axis="0 0 -1" range="-0.95 0" damping="0.1" armature="0.005"/>
+                  <geom name="rlink1_visual" type="mesh" mesh="rlink1" class="visual"
+                        material="silver_bracket"/>
+                  <body name="rlink2" pos="0.03 0 0.001" quat="0.885443 0 0 0.464748">
+                    <inertial pos="0.02257 0.00616 -0.005" mass="0.00614"
+                              diaginertia="1.58e-06 1.54e-06 4.67e-08"/>
+                    <joint name="rlink2_joint" axis="0 0 1"/>
+                    <geom name="rlink2_visual" type="mesh" mesh="rlink2" class="visual"
+                          material="silver_bracket"/>
+                  </body>
+                </body>
+
+                <!-- Gripper left finger -->
+                <body name="llink1" pos="-0.0044997 0.012375 0.029275" quat="0.625951 -0.328913 -0.625953 0.328913">
+                  <inertial pos="0.00885 -0.000342 -0.000169" mass="0.00427"
+                            diaginertia="5.37e-07 4.56e-07 8.80e-08"/>
+                  <joint name="llink1_joint" axis="0 0 1"/>
+                  <geom name="llink1_visual" type="mesh" mesh="llink1" class="visual"
+                        material="silver_bracket"/>
+                  <body name="llink2" pos="0.03 0 0.00125" quat="0.885229 0 0 -0.465155">
+                    <inertial pos="0.02263 -0.00593 -0.00525" mass="0.00614"
+                              diaginertia="1.58e-06 1.54e-06 4.67e-08"/>
+                    <joint name="llink2_joint" axis="0 0 1"/>
+                    <geom name="llink2_visual" type="mesh" mesh="llink2" class="visual"
+                          material="silver_bracket"/>
+                  </body>
+                </body>
+
+                <!-- Gripper right tip -->
+                <body name="rlink3" pos="-0.0045001 -0.0044999 0.047275" quat="0.627495 0.325958 -0.627497 -0.325958">
+                  <inertial pos="0.01479 0 -0.00271" mass="0.00271"
+                            diaginertia="1.64e-07 1.63e-07 9.18e-09"/>
+                  <joint name="rlink3_joint" axis="0 0 1"/>
+                  <geom name="rlink3_visual" type="mesh" mesh="rlink3" class="visual"
+                        material="silver_bracket"/>
+                  <geom name="right_finger_pad" type="box" class="collision"
+                        pos="0.025 0 -0.003" size="0.018 0.006 0.006"
+                        rgba="0.05 0.05 0.05 0.35" friction="2.0 0.5 0.5" mass="0.001"/>
+                </body>
+
+                <!-- Gripper left tip -->
+                <body name="llink3" pos="-0.0044999 0.0045001 0.047275" quat="0.62791 -0.325158 -0.627912 0.325158">
+                  <inertial pos="0.01479 0 -0.00271" mass="0.00271"
+                            diaginertia="1.64e-07 1.63e-07 9.18e-09"/>
+                  <joint name="llink3_joint" axis="0 0 1"/>
+                  <geom name="llink3_visual" type="mesh" mesh="llink3" class="visual"
+                        material="silver_bracket"/>
+                  <geom name="left_finger_pad" type="box" class="collision"
+                        pos="0.025 0 -0.003" size="0.018 0.006 0.006"
+                        rgba="0.05 0.05 0.05 0.35" friction="2.0 0.5 0.5" mass="0.001"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <!-- ==================== LiDAR Sites ==================== -->
+      <site name="lidar_front_site" pos="0.10 0.06 0.10" size="0.01" rgba="0 1 0 0.5"/>
+      <site name="lidar_rear_site" pos="-0.10 -0.06 0.10" size="0.01" rgba="0 1 0 0.5"/>
+
+    </body>
+  </worldbody>
+
+  <!-- ==================== Mecanum Contact Pairs ==================== -->
+  <contact>
+    <pair geom1="lwheel1_collision" geom2="ground"
+          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
+    <pair geom1="rwheel1_collision" geom2="ground"
+          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
+    <pair geom1="lwheel2_collision" geom2="ground"
+          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
+    <pair geom1="rwheel2_collision" geom2="ground"
+          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
+  </contact>
+
+  <!-- ==================== Gripper Mimic Constraints ==================== -->
+  <equality>
+    <joint joint1="llink1_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
+    <joint joint1="rlink2_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
+    <joint joint1="llink2_joint" joint2="rlink1_joint" polycoef="0 -1 0 0 0"/>
+    <joint joint1="rlink3_joint" joint2="rlink1_joint" polycoef="0 -1 0 0 0"/>
+    <joint joint1="llink3_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
+  </equality>
+
+  <!-- ==================== Actuators ==================== -->
+  <actuator>
+    <!-- Wheel velocity actuators -->
+    <velocity name="fl_wheel_motor" joint="lwheel1_joint" kv="5" ctrlrange="-20 20"/>
+    <velocity name="fr_wheel_motor" joint="rwheel1_joint" kv="5" ctrlrange="-20 20"/>
+    <velocity name="rl_wheel_motor" joint="lwheel2_joint" kv="5" ctrlrange="-20 20"/>
+    <velocity name="rr_wheel_motor" joint="rwheel2_joint" kv="5" ctrlrange="-20 20"/>
+
+    <!-- Arm position actuators -->
+    <position name="arm1_motor" joint="arm1_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm2_motor" joint="arm2_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm3_motor" joint="arm3_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm4_motor" joint="arm4_joint" kp="20" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm5_motor" joint="arm5_joint" kp="20" ctrlrange="-1.5708 1.5708"/>
+
+    <!-- Gripper (drives rlink1, others follow via equality constraints) -->
+    <position name="gripper_motor" joint="rlink1_joint" kp="25" ctrlrange="-0.95 0"/>
+  </actuator>
+
+  <!-- ==================== Sensors ==================== -->
+  <sensor>
+    <!-- IMU -->
+    <framequat name="imu_quat" objtype="site" objname="imu_site"/>
+    <gyro name="imu_gyro" site="imu_site"/>
+    <accelerometer name="imu_accel" site="imu_site"/>
+
+    <!-- Wheel encoders -->
+    <jointpos name="fl_wheel_pos" joint="lwheel1_joint"/>
+    <jointpos name="fr_wheel_pos" joint="rwheel1_joint"/>
+    <jointpos name="rl_wheel_pos" joint="lwheel2_joint"/>
+    <jointpos name="rr_wheel_pos" joint="rwheel2_joint"/>
+    <jointvel name="fl_wheel_vel" joint="lwheel1_joint"/>
+    <jointvel name="fr_wheel_vel" joint="rwheel1_joint"/>
+    <jointvel name="rl_wheel_vel" joint="lwheel2_joint"/>
+    <jointvel name="rr_wheel_vel" joint="rwheel2_joint"/>
+
+    <!-- Arm joint sensors -->
+    <jointpos name="arm1_pos" joint="arm1_joint"/>
+    <jointpos name="arm2_pos" joint="arm2_joint"/>
+    <jointpos name="arm3_pos" joint="arm3_joint"/>
+    <jointpos name="arm4_pos" joint="arm4_joint"/>
+    <jointpos name="arm5_pos" joint="arm5_joint"/>
+    <jointpos name="gripper_pos" joint="rlink1_joint"/>
+  </sensor>
+</mujoco>

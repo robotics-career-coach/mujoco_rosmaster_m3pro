@@ -44,7 +44,7 @@ The data flow is: `m3pro.xml` (MJCF) → MuJoCo engine → `MujocoSystemInterfac
 
 ## Key Design Decisions
 
-- **Mesh scale**: STL files from Yahboom are in millimeters. All mesh references use `scale="0.001 0.001 0.001"`.
+- **Mesh scale**: STL files from Yahboom are in meters (SI units). No scale factor is needed on mesh references.
 - **Mecanum wheels**: Modeled as cylinder collision geoms with `condim="4"` anisotropic friction under an `elliptic` friction cone. Visual meshes are separate (class="visual", no collision). The actual omnidirectional kinematics are handled by the `mecanum_drive_controller`, not the physics friction — friction values primarily need to provide enough traction for the controller to work.
 - **Body hierarchy**: Everything is under a single `base_link` body with a `freejoint`. The prior URDF-to-MJCF conversions in `urdf/` had wheels as siblings of the arm in `worldbody` (broken for mobile simulation) — the `src/` model fixes this.
 - **Gripper**: Uses MuJoCo equality constraints to couple all finger joints to `rlink1_joint` (mimic joints from the original URDF).
@@ -57,7 +57,3 @@ Arm joints: `arm1_joint` through `arm5_joint`
 Gripper: `rlink1_joint` (primary), `llink1_joint`, `rlink2_joint`, `llink2_joint`, `rlink3_joint`, `llink3_joint` (coupled via equality constraints)
 
 These names must match across `m3pro.xml`, `m3pro.urdf`, and `controllers.yaml`.
-
-## Files in urdf/ (Root)
-
-The `urdf/` directory at repository root contains the **original** Yahboom URDF and several prior MuJoCo XML conversion attempts (some with Windows absolute paths, some with incorrect body hierarchy). These are kept for reference only. The active simulation model is `src/m3pro_description/mjcf/m3pro.xml`.

@@ -9,9 +9,6 @@ controller_manager:
     mecanum_drive_controller:
       type: mecanum_drive_controller/MecanumDriveController
 
-    imu_sensor_broadcaster:
-      type: imu_sensor_broadcaster/IMUSensorBroadcaster
-
     arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
@@ -40,12 +37,6 @@ mecanum_drive_controller:
     enable_odom_tf: true
 
     velocity_rolling_window_size: 10
-
-
-imu_sensor_broadcaster:
-  ros__parameters:
-    sensor_name: imu_sensor
-    frame_id: imu_link
 
 
 arm_controller:

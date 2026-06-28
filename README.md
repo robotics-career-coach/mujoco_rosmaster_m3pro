@@ -2,6 +2,8 @@
 
 MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yahboom.net/products/rosmaster-m3-pro) robot with ROS2 Humble integration via `ros2_control`. The simulation publishes sensor data and accepts velocity commands on standard ROS topics, enabling development of navigation, perception, and control algorithms without the physical robot.
 
+![MuJoCo simulation of the ROSMASTER M3 Pro](resources/mujoco_rosmaster_m3pro.png)
+
 ## Robot Features Simulated
 
 - **Mecanum drive base** — 4 mecanum wheels with anisotropic friction, omnidirectional motion
@@ -17,7 +19,7 @@ MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yah
 src/
 ├── m3pro_description/       # Robot model package
 │   ├── mjcf/m3pro.xml       # MuJoCo model (primary simulation model)
-│   ├── urdf/                # URDF xacro files for robot_state_publisher & ros2_control
+│   ├── urdf/                # Plain URDF for robot_state_publisher & ros2_control
 │   ├── meshes/              # STL mesh files from Yahboom CAD
 │   ├── rviz/                # RViz display config
 │   └── launch/              # display.launch.py (RViz-only visualization)
@@ -25,15 +27,11 @@ src/
 └── m3pro_mujoco_sim/        # Simulation launch & config package
     ├── config/
     │   ├── controllers.yaml       # ros2_control controller definitions
-    │   ├── mujoco_plugins.yaml    # Camera & LiDAR sensor plugin config
-    │   └── mujoco_sim.yaml        # MuJoCo simulation parameters
+    │   └── mujoco_plugins.yaml    # Camera & LiDAR sensor plugin config
     ├── launch/
     │   ├── sim.launch.py          # Headless simulation
     │   └── sim_with_rviz.launch.py
     └── worlds/                    # Scene files with obstacles
-
-meshes/    # Original mesh files from the robot
-urdf/      # Original Yahboom URDF and prior MuJoCo XML conversion attempts
 ```
 
 ## ROS Topics
@@ -52,7 +50,7 @@ urdf/      # Original Yahboom URDF and prior MuJoCo XML conversion attempts
 |-------|------|-------------|
 | `/joint_states` | `sensor_msgs/JointState` | All joint positions and velocities |
 | `/mecanum_drive_controller/odom` | `nav_msgs/Odometry` | Wheel odometry |
-| `/imu_sensor_broadcaster/imu` | `sensor_msgs/Imu` | IMU data |
+| `/imu/data` | `sensor_msgs/Imu` | IMU data (via MuJoCo sensor plugin) |
 | `/depth_camera/color/image_raw` | `sensor_msgs/Image` | RGB camera image |
 | `/depth_camera/depth/image_raw` | `sensor_msgs/Image` | Depth image |
 | `/lidar_front/scan` | `sensor_msgs/LaserScan` | Front LiDAR scan |
@@ -148,7 +146,6 @@ The simulation uses `ros-controls/mujoco_ros2_control` as the bridge between MuJ
 │  ros2_control Controller Manager            │
 │  ├── mecanum_drive_controller               │
 │  ├── joint_state_broadcaster                │
-│  ├── imu_sensor_broadcaster                 │
 │  ├── arm_controller (JointTrajectory)       │
 │  └── gripper_controller                     │
 └──────────────┬──────────────────────────────┘

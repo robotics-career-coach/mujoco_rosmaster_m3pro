@@ -1,7 +1,0 @@
-# MuJoCo simulation parameters
-
-mujoco_ros2_control:
-  ros__parameters:
-    mujoco_model_path: ""  # Set via launch file
-    robot_description: ""  # Set via launch file
-    use_sim_time: true

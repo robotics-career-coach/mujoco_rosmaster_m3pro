@@ -5,7 +5,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/base_link.stl"/>
       </geometry>
       <material name="grey">
         <color rgba="0.502 0.502 0.502 1"/>
@@ -28,7 +28,7 @@
   <link name="lwheel1">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/lwheel1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/lwheel1.stl"/>
       </geometry>
       <material name="dark_grey">
         <color rgba="0.298 0.298 0.298 1"/>
@@ -57,7 +57,7 @@
   <link name="rwheel1">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/rwheel1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/rwheel1.stl"/>
       </geometry>
       <material name="dark_grey"/>
     </visual>
@@ -84,7 +84,7 @@
   <link name="lwheel2">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/lwheel2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/lwheel2.stl"/>
       </geometry>
       <material name="dark_grey"/>
     </visual>
@@ -111,7 +111,7 @@
   <link name="rwheel2">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/rwheel2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/rwheel2.stl"/>
       </geometry>
       <material name="dark_grey"/>
     </visual>
@@ -138,7 +138,7 @@
   <link name="camera_link">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/Camera.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/Camera.stl"/>
       </geometry>
       <material name="grey"/>
     </visual>
@@ -190,7 +190,7 @@
   <link name="arm_base_link">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/arm_base_Link.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/arm_base_Link.stl"/>
       </geometry>
       <material name="green">
         <color rgba="0 0.627 0.235 1"/>
@@ -211,7 +211,7 @@
   <link name="arm1">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/arm1.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/arm1.stl"/>
       </geometry>
     </visual>
     <inertial>
@@ -232,7 +232,7 @@
   <link name="arm2">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/arm2.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/arm2.stl"/>
       </geometry>
     </visual>
     <inertial>
@@ -253,7 +253,7 @@
   <link name="arm3">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/arm3.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/arm3.stl"/>
       </geometry>
     </visual>
     <inertial>
@@ -274,7 +274,7 @@
   <link name="arm4">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/arm4.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/arm4.stl"/>
       </geometry>
     </visual>
     <inertial>
@@ -295,7 +295,7 @@
   <link name="arm5">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/arm5.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/arm5.stl"/>
       </geometry>
     </visual>
     <inertial>
@@ -316,7 +316,7 @@
   <link name="gripper_link">
     <visual>
       <geometry>
-        <mesh filename="package://m3pro_description/meshes/Gripping.stl" scale="0.001 0.001 0.001"/>
+        <mesh filename="package://m3pro_description/meshes/Gripping.stl"/>
       </geometry>
     </visual>
     <inertial>
@@ -394,19 +394,7 @@
       <state_interface name="velocity"/>
     </joint>
 
-    <!-- IMU sensor -->
-    <sensor name="imu_sensor">
-      <state_interface name="orientation.x"/>
-      <state_interface name="orientation.y"/>
-      <state_interface name="orientation.z"/>
-      <state_interface name="orientation.w"/>
-      <state_interface name="angular_velocity.x"/>
-      <state_interface name="angular_velocity.y"/>
-      <state_interface name="angular_velocity.z"/>
-      <state_interface name="linear_acceleration.x"/>
-      <state_interface name="linear_acceleration.y"/>
-      <state_interface name="linear_acceleration.z"/>
-    </sensor>
+
   </ros2_control>
 
 </robot>

@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-MuJoCo simulation of the Yahboom ROSMASTER M3 Pro robot integrated with ROS2 Jazzy via `ros-controls/mujoco_ros2_control`. The simulation exposes standard ROS topics for a mecanum-drive mobile base with a 6-DOF arm, dual LiDAR, depth camera, and IMU.
+MuJoCo simulation of the Yahboom ROSMASTER M3 Pro robot integrated with ROS2 Humble via `ros-controls/mujoco_ros2_control`. The simulation exposes standard ROS topics for a mecanum-drive mobile base with a 6-DOF arm, dual LiDAR, depth camera, and IMU.
 
 ## Build and Run
 
 ```bash
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 

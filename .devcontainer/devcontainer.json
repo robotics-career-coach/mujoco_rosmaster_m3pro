@@ -36,7 +36,7 @@
         "smilerobotics.urdf"
       ],
       "settings": {
-        "ros.distro": "jazzy",
+        "ros.distro": "humble",
         "terminal.integrated.defaultProfile.linux": "bash",
         "files.associations": {
           "*.xacro": "xml",
@@ -47,7 +47,7 @@
     }
   },
 
-  "postCreateCommand": "sudo chown -R dev:dev /workspaces/mujoco_rosmaster_m3pro && source /opt/ros/jazzy/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release",
+  "postCreateCommand": "sudo chown -R dev:dev /workspaces/mujoco_rosmaster_m3pro && source /opt/ros/humble/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release",
 
   "remoteUser": "dev"
 }

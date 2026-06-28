@@ -1,6 +1,6 @@
 # Yahboom ROSMASTER M3 Pro MuJoCo Simulation 
 
-MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yahboom.net/products/rosmaster-m3-pro) robot with ROS2 Jazzy integration via `ros2_control`. The simulation publishes sensor data and accepts velocity commands on standard ROS topics, enabling development of navigation, perception, and control algorithms without the physical robot.
+MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yahboom.net/products/rosmaster-m3-pro) robot with ROS2 Humble integration via `ros2_control`. The simulation publishes sensor data and accepts velocity commands on standard ROS topics, enabling development of navigation, perception, and control algorithms without the physical robot.
 
 ## Robot Features Simulated
 
@@ -74,32 +74,32 @@ ros2 launch m3pro_mujoco_sim sim.launch.py
 
 > **GUI note:** For MuJoCo viewer and RViz, you need X11 forwarding. On Linux/WSL2 this works out of the box. On macOS, install [XQuartz](https://www.xquartz.org/) and run `xhost +local:docker` first.
 
-## Manual Setup (Ubuntu 24.04)
+## Manual Setup (Ubuntu 22.04)
 
 ### Prerequisites
 
-- **Ubuntu 24.04** (native or WSL2)
-- **ROS2 Jazzy** — [Installation guide](https://docs.ros.org/en/jazzy/Installation.html)
+- **Ubuntu 22.04** (native or WSL2)
+- **ROS2 Humble** — [Installation guide](https://docs.ros.org/en/humble/Installation.html)
 
 ### 1. Install dependencies
 
 ```bash
 sudo apt update
 sudo apt install -y \
-  ros-jazzy-mujoco-ros2-control \
-  ros-jazzy-ros2-controllers \
-  ros-jazzy-controller-manager \
-  ros-jazzy-robot-state-publisher \
-  ros-jazzy-joint-state-publisher-gui \
-  ros-jazzy-rviz2 \
-  ros-jazzy-teleop-twist-keyboard
+  ros-humble-mujoco-ros2-control \
+  ros-humble-ros2-controllers \
+  ros-humble-controller-manager \
+  ros-humble-robot-state-publisher \
+  ros-humble-joint-state-publisher-gui \
+  ros-humble-rviz2 \
+  ros-humble-teleop-twist-keyboard
 pip install mujoco
 ```
 
 ### 2. Build
 
 ```bash
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```

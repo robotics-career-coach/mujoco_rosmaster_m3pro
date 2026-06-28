@@ -58,51 +58,45 @@ urdf/      # Original Yahboom URDF and prior MuJoCo XML conversion attempts
 | `/lidar_front/scan` | `sensor_msgs/LaserScan` | Front LiDAR scan |
 | `/lidar_rear/scan` | `sensor_msgs/LaserScan` | Rear LiDAR scan |
 
-## Prerequisites
+## Quick Start (Dev Container)
 
+The easiest way to get started on any OS — all dependencies are pre-installed:
+
+1. Install [Docker](https://docs.docker.com/get-docker/) and [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+2. Clone this repo and open it in VS Code
+3. When prompted, click **"Reopen in Container"** (or run `Dev Containers: Reopen in Container` from the command palette)
+4. The container builds and installs all dependencies automatically. Once ready:
+
+```bash
+source install/setup.bash
+ros2 launch m3pro_mujoco_sim sim.launch.py
+```
+
+> **GUI note:** For MuJoCo viewer and RViz, you need X11 forwarding. On Linux/WSL2 this works out of the box. On macOS, install [XQuartz](https://www.xquartz.org/) and run `xhost +local:docker` first.
+
+## Manual Setup (Ubuntu 24.04)
+
+### Prerequisites
+
+- **Ubuntu 24.04** (native or WSL2)
 - **ROS2 Jazzy** — [Installation guide](https://docs.ros.org/en/jazzy/Installation.html)
-- **MuJoCo** — Installed automatically as a dependency of `mujoco_ros2_control`
 
-## Setup
-
-### 1. Install ROS2 dependencies
+### 1. Install dependencies
 
 ```bash
 sudo apt update
 sudo apt install -y \
-  ros-jazzy-ros2-control \
+  ros-jazzy-mujoco-ros2-control \
   ros-jazzy-ros2-controllers \
   ros-jazzy-controller-manager \
   ros-jazzy-robot-state-publisher \
   ros-jazzy-joint-state-publisher-gui \
-  ros-jazzy-xacro \
   ros-jazzy-rviz2 \
   ros-jazzy-teleop-twist-keyboard
+pip install mujoco
 ```
 
-### 2. Install mujoco_ros2_control
-
-Check if a binary package is available:
-
-```bash
-sudo apt install ros-jazzy-mujoco-ros2-control
-```
-
-If not available via apt, build from source:
-
-```bash
-cd src/
-git clone -b main https://github.com/ros-controls/mujoco_ros2_control.git
-cd ..
-```
-
-### 3. Install remaining dependencies via rosdep
-
-```bash
-rosdep install --from-paths src --ignore-src -r -y
-```
-
-## Build
+### 2. Build
 
 ```bash
 source /opt/ros/jazzy/setup.bash

@@ -1,8 +1,9 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import RegisterEventHandler, Shutdown, TimerAction
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, Shutdown, TimerAction
 from launch.event_handlers import OnProcessExit, OnProcessStart
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -10,13 +11,18 @@ def generate_launch_description():
     description_pkg = get_package_share_directory('m3pro_description')
     sim_pkg = get_package_share_directory('m3pro_mujoco_sim')
 
+    scene_arg = DeclareLaunchArgument(
+        'scene', default_value='empty',
+        description='Scene to load (maps to mjcf/scene_<value>.xml)',
+    )
+
     robot_description_file = os.path.join(
         description_pkg, 'urdf', 'm3pro.urdf'
     )
     with open(robot_description_file, 'r') as f:
         robot_description_content = f.read()
 
-    mujoco_model_path = os.path.join(description_pkg, 'mjcf', 'm3pro.xml')
+    mjcf_dir = os.path.join(description_pkg, 'mjcf', '')
     controllers_file = os.path.join(sim_pkg, 'config', 'controllers.yaml')
     mujoco_plugins_file = os.path.join(sim_pkg, 'config', 'mujoco_plugins.yaml')
 
@@ -25,7 +31,9 @@ def generate_launch_description():
         package='m3pro_description',
         executable='mjcf_publisher',
         name='mjcf_description_publisher',
-        parameters=[{'mjcf_path': mujoco_model_path}],
+        parameters=[{
+            'mjcf_path': [mjcf_dir, 'scene_', LaunchConfiguration('scene'), '.xml'],
+        }],
         output='screen',
     )
 
@@ -123,6 +131,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        scene_arg,
         mjcf_publisher_node,
         delay_ros2_control,
         shutdown_on_sim_exit,

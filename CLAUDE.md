@@ -19,7 +19,7 @@ ros2 launch m3pro_mujoco_sim sim_with_rviz.launch.py # with RViz
 
 # Drive with keyboard
 ros2 run teleop_twist_keyboard teleop_twist_keyboard \
-  --ros-args --remap cmd_vel:=/mecanum_drive_controller/cmd_vel_unstamped
+  --ros-args --remap cmd_vel:=/mecanum_drive_controller/reference_unstamped
 
 # View URDF only (no simulation)
 ros2 launch m3pro_description display.launch.py

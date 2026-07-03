@@ -28,11 +28,11 @@ sudo apt install -y \
   ros-humble-joint-state-publisher-gui \
   ros-humble-rviz2 \
   ros-humble-teleop-twist-keyboard \
-  ros-humble-mujoco-ros2-control \ # may need to be built from source if not in apt
-
+  ros-humble-mujoco-ros2-control \
   python3-colcon-common-extensions \
   python3-rosdep \
   python3-pip
+# Note: ros-humble-mujoco-ros2-control may need to be built from source if not in apt
 
 echo "=== [4/6] GPU / rendering libraries ==="
 # Mesa OpenGL + D3D12 backend (WSL2 GPU passthrough already provides libcuda/libd3d12)

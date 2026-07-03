@@ -30,17 +30,17 @@ def generate_launch_description():
     )
 
     mujoco_ros2_control_node = Node(
-        package='mujoco_ros2_control',
-        executable='ros2_control_node',
-        output='screen',
-        parameters=[
-            controllers_file,
-            mujoco_plugins_file,
-        ],
-        remappings=[
-            ('~/robot_description', '/robot_description'),
-        ],
-    )
+    package='mujoco_ros2_control',
+    executable='mujoco_ros2_control',
+    output='screen',
+    parameters=[
+        controllers_file,
+        mujoco_plugins_file,
+        {
+            'robot_model_path': mujoco_model_path,
+        },
+    ],
+)
 
     robot_state_publisher_node = Node(
         package='robot_state_publisher',

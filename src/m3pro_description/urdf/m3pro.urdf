@@ -140,7 +140,9 @@
       <geometry>
         <mesh filename="package://m3pro_description/meshes/Camera.stl"/>
       </geometry>
-      <material name="grey"/>
+      <material name="camera_body">
+        <color rgba="0.22 0.22 0.24 1"/>
+      </material>
     </visual>
     <inertial>
       <origin xyz="-0.00516 0.01716 0"/>
@@ -213,6 +215,9 @@
       <geometry>
         <mesh filename="package://m3pro_description/meshes/arm1.stl"/>
       </geometry>
+      <material name="blue_servo">
+        <color rgba="0.15 0.35 0.7 1"/>
+      </material>
     </visual>
     <inertial>
       <origin xyz="0 0 0.0109"/>
@@ -234,6 +239,9 @@
       <geometry>
         <mesh filename="package://m3pro_description/meshes/arm2.stl"/>
       </geometry>
+      <material name="silver_bracket">
+        <color rgba="0.75 0.75 0.78 1"/>
+      </material>
     </visual>
     <inertial>
       <origin xyz="0 0 0.0264"/>
@@ -255,6 +263,7 @@
       <geometry>
         <mesh filename="package://m3pro_description/meshes/arm3.stl"/>
       </geometry>
+      <material name="silver_bracket"/>
     </visual>
     <inertial>
       <origin xyz="0 0 0.0258"/>
@@ -276,6 +285,7 @@
       <geometry>
         <mesh filename="package://m3pro_description/meshes/arm4.stl"/>
       </geometry>
+      <material name="blue_servo"/>
     </visual>
     <inertial>
       <origin xyz="0.00266 0 0.0318"/>
@@ -291,12 +301,30 @@
     <limit lower="-1.5708" upper="1.5708" effort="100" velocity="1"/>
   </joint>
 
+  <!-- Wrist camera (fixed to arm4) -->
+  <link name="wrist_camera_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/DCW2.stl"/>
+      </geometry>
+      <material name="dark_plastic">
+        <color rgba="0.18 0.18 0.18 1"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="wrist_camera_joint" type="fixed">
+    <parent link="arm4"/>
+    <child link="wrist_camera_link"/>
+    <origin xyz="-0.0484 0.00245 0.0672" rpy="0.028287 -1.570796 0"/>
+  </joint>
+
   <!-- Arm joint 5 -->
   <link name="arm5">
     <visual>
       <geometry>
         <mesh filename="package://m3pro_description/meshes/arm5.stl"/>
       </geometry>
+      <material name="blue_servo"/>
     </visual>
     <inertial>
       <origin xyz="0.0186 -0.00247 0.0265"/>
@@ -312,24 +340,152 @@
     <limit lower="-1.5708" upper="1.5708" effort="100" velocity="1"/>
   </joint>
 
-  <!-- Gripper -->
-  <link name="gripper_link">
+  <!-- Gripper housing (stationary, fixed to arm5) -->
+  <link name="gripping_housing">
     <visual>
       <geometry>
         <mesh filename="package://m3pro_description/meshes/Gripping.stl"/>
       </geometry>
+      <material name="silver_bracket"/>
     </visual>
     <inertial>
       <mass value="0.012"/>
       <inertia ixx="2.4e-06" ixy="0" ixz="0" iyy="1.5e-06" iyz="0" izz="3.9e-06"/>
     </inertial>
   </link>
+  <joint name="gripping_housing_joint" type="fixed">
+    <parent link="arm5"/>
+    <child link="gripping_housing"/>
+    <origin xyz="-0.000625 0.00024 0.093235" rpy="3.108257 -1.570792 -3.108286"/>
+  </joint>
+
+  <!-- Gripper: right finger chain (primary actuated joint) -->
+  <link name="rlink1">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/rlink1.stl"/>
+      </geometry>
+      <material name="silver_bracket"/>
+    </visual>
+    <inertial>
+      <origin xyz="0.00809 0.000355 -0.000465"/>
+      <mass value="0.00470"/>
+      <inertia ixx="5.46e-07" ixy="0" ixz="0" iyy="4.54e-07" iyz="0" izz="1.01e-07"/>
+    </inertial>
+  </link>
   <joint name="rlink1_joint" type="revolute">
     <parent link="arm5"/>
-    <child link="gripper_link"/>
-    <origin xyz="-0.0048 -0.0126 0.029275" rpy="1.5708 -0.604 -1.5708"/>
+    <child link="rlink1"/>
+    <origin xyz="-0.0047503 -0.012625 0.029275" rpy="1.570801 -0.604091 -1.570801"/>
     <axis xyz="0 0 -1"/>
     <limit lower="-0.95" upper="0" effort="100" velocity="1"/>
+  </joint>
+
+  <link name="rlink2">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/rlink2.stl"/>
+      </geometry>
+      <material name="silver_bracket"/>
+    </visual>
+    <inertial>
+      <origin xyz="0.02257 0.00616 -0.005"/>
+      <mass value="0.00614"/>
+      <inertia ixx="1.58e-06" ixy="0" ixz="0" iyy="1.54e-06" iyz="0" izz="4.67e-08"/>
+    </inertial>
+  </link>
+  <joint name="rlink2_joint" type="continuous">
+    <parent link="rlink1"/>
+    <child link="rlink2"/>
+    <origin xyz="0.03 0 0.001" rpy="0 0 0.9667"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="rlink1_joint" multiplier="1.0" offset="0.0"/>
+  </joint>
+
+  <!-- Gripper: left finger chain (mimics rlink1_joint via MuJoCo equality constraints) -->
+  <link name="llink1">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/llink1.stl"/>
+      </geometry>
+      <material name="silver_bracket"/>
+    </visual>
+    <inertial>
+      <origin xyz="0.00885 -0.000342 -0.000169"/>
+      <mass value="0.00427"/>
+      <inertia ixx="5.37e-07" ixy="0" ixz="0" iyy="4.56e-07" iyz="0" izz="8.80e-08"/>
+    </inertial>
+  </link>
+  <joint name="llink1_joint" type="continuous">
+    <parent link="arm5"/>
+    <child link="llink1"/>
+    <origin xyz="-0.0044997 0.012375 0.029275" rpy="-1.570799 -0.603181 1.570799"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="rlink1_joint" multiplier="1.0" offset="0.0"/>
+  </joint>
+
+  <link name="llink2">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/llink2.stl"/>
+      </geometry>
+      <material name="silver_bracket"/>
+    </visual>
+    <inertial>
+      <origin xyz="0.02263 -0.00593 -0.00525"/>
+      <mass value="0.00614"/>
+      <inertia ixx="1.58e-06" ixy="0" ixz="0" iyy="1.54e-06" iyz="0" izz="4.67e-08"/>
+    </inertial>
+  </link>
+  <joint name="llink2_joint" type="continuous">
+    <parent link="llink1"/>
+    <child link="llink2"/>
+    <origin xyz="0.03 0 0.00125" rpy="0 0 -0.96762"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="rlink1_joint" multiplier="-1.0" offset="0.0"/>
+  </joint>
+
+  <!-- Gripper: fingertip pads (mimic rlink1_joint via MuJoCo equality constraints) -->
+  <link name="rlink3">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/rlink3.stl"/>
+      </geometry>
+      <material name="silver_bracket"/>
+    </visual>
+    <inertial>
+      <origin xyz="0.01479 0 -0.00271"/>
+      <mass value="0.00271"/>
+      <inertia ixx="1.64e-07" ixy="0" ixz="0" iyy="1.63e-07" iyz="0" izz="9.18e-09"/>
+    </inertial>
+  </link>
+  <joint name="rlink3_joint" type="continuous">
+    <parent link="arm5"/>
+    <child link="rlink3"/>
+    <origin xyz="-0.0045001 -0.0044999 0.047275" rpy="1.570799 -0.612611 -1.570799"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="rlink1_joint" multiplier="-1.0" offset="0.0"/>
+  </joint>
+
+  <link name="llink3">
+    <visual>
+      <geometry>
+        <mesh filename="package://m3pro_description/meshes/llink3.stl"/>
+      </geometry>
+      <material name="silver_bracket"/>
+    </visual>
+    <inertial>
+      <origin xyz="0.01479 0 -0.00271"/>
+      <mass value="0.00271"/>
+      <inertia ixx="1.64e-07" ixy="0" ixz="0" iyy="1.63e-07" iyz="0" izz="9.18e-09"/>
+    </inertial>
+  </link>
+  <joint name="llink3_joint" type="continuous">
+    <parent link="arm5"/>
+    <child link="llink3"/>
+    <origin xyz="-0.0044999 0.0045001 0.047275" rpy="-1.570799 -0.615160 1.570799"/>
+    <axis xyz="0 0 1"/>
+    <mimic joint="rlink1_joint" multiplier="1.0" offset="0.0"/>
   </joint>
 
   <!-- ros2_control hardware interface for MuJoCo -->

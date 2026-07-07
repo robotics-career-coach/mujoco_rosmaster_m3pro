@@ -1,7 +1,7 @@
 <mujoco model="m3pro">
   <compiler angle="radian" meshdir="../meshes"/>
 
-  <option timestep="0.002" gravity="0 0 -9.81" cone="elliptic"/>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"/>
 
   <visual>
     <global azimuth="135" elevation="-25"/>
@@ -18,6 +18,10 @@
 
     <default class="collision">
       <geom group="3" rgba="0.5 0.5 0.5 0.3"/>
+    </default>
+
+    <default class="wheel_contact">
+      <geom contype="1" conaffinity="0" group="3" rgba="0.5 0.5 0.5 0.3"/>
     </default>
   </default>
 
@@ -65,7 +69,7 @@
           condim="4" friction="1.0 0.5 0.01"/>
 
     <!-- ==================== Robot Base ==================== -->
-    <body name="base_link" pos="0 0 0.042">
+    <body name="base_link" pos="0 0 0">
       <freejoint name="base_freejoint"/>
       <inertial pos="-0.0231 -0.000624 0.0924" mass="0.871"
                 diaginertia="0.000965 0.000924 0.00167"/>
@@ -89,7 +93,14 @@
                        |   |
           lwheel2 (RL)  ---  rwheel2 (RR)
 
-        Mecanum X-pattern via anisotropic friction (condim=4, elliptic cone).
+        Mecanum X-pattern via 12 passive free-spinning roller bodies per wheel
+        (see scripts/generate_mecanum_rollers.py), not friction anisotropy. Roller count/
+        radius/tilt are a simulation approximation, not a reverse-engineered match to the
+        real ROSMASTER M3 Pro's physical roller wheels, and the resulting effective rolling
+        radius is slightly under the nominal 0.04 m used in controllers.yaml's
+        kinematics. Flagged for future calibration against real hardware. NUM_ROLLERS is a
+        deliberate smoothness/grip-authority trade-off -- see the design note in the
+        generator script and CLAUDE.md before changing it.
       -->
 
       <!-- Front-left wheel -->
@@ -99,9 +110,56 @@
         <joint name="lwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
         <geom name="lwheel1_visual" type="mesh" mesh="lwheel1" class="visual"
               material="black_rubber"/>
-        <geom name="lwheel1_collision" type="cylinder" size="0.04 0.0275"
-              pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+        <geom name="lwheel1_collision" type="cylinder" size="0.0310 0.0275"
+              pos="0 0 0.0109" class="wheel_contact"/>
+        <body name="lwheel1_roller0" pos="0.008875 0.033122 0.010900">
+          <joint name="lwheel1_roller0_joint" type="hinge" axis="0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller0_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller1" pos="0.024247 0.024247 0.010900">
+          <joint name="lwheel1_roller1_joint" type="hinge" axis="0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller1_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller2" pos="0.033122 0.008875 0.010900">
+          <joint name="lwheel1_roller2_joint" type="hinge" axis="0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller2_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller3" pos="0.033122 -0.008875 0.010900">
+          <joint name="lwheel1_roller3_joint" type="hinge" axis="-0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller3_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller4" pos="0.024247 -0.024247 0.010900">
+          <joint name="lwheel1_roller4_joint" type="hinge" axis="-0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller4_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller5" pos="0.008875 -0.033122 0.010900">
+          <joint name="lwheel1_roller5_joint" type="hinge" axis="-0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller5_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller6" pos="-0.008875 -0.033122 0.010900">
+          <joint name="lwheel1_roller6_joint" type="hinge" axis="-0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller6_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller7" pos="-0.024247 -0.024247 0.010900">
+          <joint name="lwheel1_roller7_joint" type="hinge" axis="-0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller7_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller8" pos="-0.033122 -0.008875 0.010900">
+          <joint name="lwheel1_roller8_joint" type="hinge" axis="-0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller8_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller9" pos="-0.033122 0.008875 0.010900">
+          <joint name="lwheel1_roller9_joint" type="hinge" axis="0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller9_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller10" pos="-0.024247 0.024247 0.010900">
+          <joint name="lwheel1_roller10_joint" type="hinge" axis="0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller10_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel1_roller11" pos="-0.008875 0.033122 0.010900">
+          <joint name="lwheel1_roller11_joint" type="hinge" axis="0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel1_roller11_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
       </body>
 
       <!-- Front-right wheel -->
@@ -111,9 +169,56 @@
         <joint name="rwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
         <geom name="rwheel1_visual" type="mesh" mesh="rwheel1" class="visual"
               material="black_rubber"/>
-        <geom name="rwheel1_collision" type="cylinder" size="0.04 0.0275"
-              pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+        <geom name="rwheel1_collision" type="cylinder" size="0.0310 0.0275"
+              pos="0 0 0.0109" class="wheel_contact"/>
+        <body name="rwheel1_roller0" pos="-0.008875 0.033122 0.010900">
+          <joint name="rwheel1_roller0_joint" type="hinge" axis="-0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller0_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller1" pos="0.008875 0.033122 0.010900">
+          <joint name="rwheel1_roller1_joint" type="hinge" axis="-0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller1_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller2" pos="0.024247 0.024247 0.010900">
+          <joint name="rwheel1_roller2_joint" type="hinge" axis="-0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller2_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller3" pos="0.033122 0.008875 0.010900">
+          <joint name="rwheel1_roller3_joint" type="hinge" axis="-0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller3_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller4" pos="0.033122 -0.008875 0.010900">
+          <joint name="rwheel1_roller4_joint" type="hinge" axis="0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller4_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller5" pos="0.024247 -0.024247 0.010900">
+          <joint name="rwheel1_roller5_joint" type="hinge" axis="0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller5_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller6" pos="0.008875 -0.033122 0.010900">
+          <joint name="rwheel1_roller6_joint" type="hinge" axis="0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller6_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller7" pos="-0.008875 -0.033122 0.010900">
+          <joint name="rwheel1_roller7_joint" type="hinge" axis="0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller7_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller8" pos="-0.024247 -0.024247 0.010900">
+          <joint name="rwheel1_roller8_joint" type="hinge" axis="0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller8_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller9" pos="-0.033122 -0.008875 0.010900">
+          <joint name="rwheel1_roller9_joint" type="hinge" axis="0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller9_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller10" pos="-0.033122 0.008875 0.010900">
+          <joint name="rwheel1_roller10_joint" type="hinge" axis="-0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller10_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel1_roller11" pos="-0.024247 0.024247 0.010900">
+          <joint name="rwheel1_roller11_joint" type="hinge" axis="-0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel1_roller11_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
       </body>
 
       <!-- Rear-left wheel -->
@@ -123,9 +228,56 @@
         <joint name="lwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
         <geom name="lwheel2_visual" type="mesh" mesh="lwheel2" class="visual"
               material="black_rubber"/>
-        <geom name="lwheel2_collision" type="cylinder" size="0.04 0.0275"
-              pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+        <geom name="lwheel2_collision" type="cylinder" size="0.0310 0.0275"
+              pos="0 0 0.0109" class="wheel_contact"/>
+        <body name="lwheel2_roller0" pos="-0.008875 0.033122 0.010900">
+          <joint name="lwheel2_roller0_joint" type="hinge" axis="-0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller0_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller1" pos="0.008875 0.033122 0.010900">
+          <joint name="lwheel2_roller1_joint" type="hinge" axis="-0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller1_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller2" pos="0.024247 0.024247 0.010900">
+          <joint name="lwheel2_roller2_joint" type="hinge" axis="-0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller2_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller3" pos="0.033122 0.008875 0.010900">
+          <joint name="lwheel2_roller3_joint" type="hinge" axis="-0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller3_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller4" pos="0.033122 -0.008875 0.010900">
+          <joint name="lwheel2_roller4_joint" type="hinge" axis="0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller4_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller5" pos="0.024247 -0.024247 0.010900">
+          <joint name="lwheel2_roller5_joint" type="hinge" axis="0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller5_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller6" pos="0.008875 -0.033122 0.010900">
+          <joint name="lwheel2_roller6_joint" type="hinge" axis="0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller6_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller7" pos="-0.008875 -0.033122 0.010900">
+          <joint name="lwheel2_roller7_joint" type="hinge" axis="0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller7_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller8" pos="-0.024247 -0.024247 0.010900">
+          <joint name="lwheel2_roller8_joint" type="hinge" axis="0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller8_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller9" pos="-0.033122 -0.008875 0.010900">
+          <joint name="lwheel2_roller9_joint" type="hinge" axis="0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller9_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller10" pos="-0.033122 0.008875 0.010900">
+          <joint name="lwheel2_roller10_joint" type="hinge" axis="-0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller10_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="lwheel2_roller11" pos="-0.024247 0.024247 0.010900">
+          <joint name="lwheel2_roller11_joint" type="hinge" axis="-0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="lwheel2_roller11_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
       </body>
 
       <!-- Rear-right wheel -->
@@ -135,9 +287,56 @@
         <joint name="rwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
         <geom name="rwheel2_visual" type="mesh" mesh="rwheel2" class="visual"
               material="black_rubber"/>
-        <geom name="rwheel2_collision" type="cylinder" size="0.04 0.0275"
-              pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+        <geom name="rwheel2_collision" type="cylinder" size="0.0310 0.0275"
+              pos="0 0 0.0109" class="wheel_contact"/>
+        <body name="rwheel2_roller0" pos="0.008875 0.033122 0.010900">
+          <joint name="rwheel2_roller0_joint" type="hinge" axis="0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller0_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller1" pos="0.024247 0.024247 0.010900">
+          <joint name="rwheel2_roller1_joint" type="hinge" axis="0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller1_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller2" pos="0.033122 0.008875 0.010900">
+          <joint name="rwheel2_roller2_joint" type="hinge" axis="0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller2_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller3" pos="0.033122 -0.008875 0.010900">
+          <joint name="rwheel2_roller3_joint" type="hinge" axis="-0.082018 -0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller3_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller4" pos="0.024247 -0.024247 0.010900">
+          <joint name="rwheel2_roller4_joint" type="hinge" axis="-0.224077 -0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller4_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller5" pos="0.008875 -0.033122 0.010900">
+          <joint name="rwheel2_roller5_joint" type="hinge" axis="-0.306094 -0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller5_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller6" pos="-0.008875 -0.033122 0.010900">
+          <joint name="rwheel2_roller6_joint" type="hinge" axis="-0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller6_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller7" pos="-0.024247 -0.024247 0.010900">
+          <joint name="rwheel2_roller7_joint" type="hinge" axis="-0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller7_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller8" pos="-0.033122 -0.008875 0.010900">
+          <joint name="rwheel2_roller8_joint" type="hinge" axis="-0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller8_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller9" pos="-0.033122 0.008875 0.010900">
+          <joint name="rwheel2_roller9_joint" type="hinge" axis="0.082018 0.306094 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller9_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller10" pos="-0.024247 0.024247 0.010900">
+          <joint name="rwheel2_roller10_joint" type="hinge" axis="0.224077 0.224077 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller10_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
+        <body name="rwheel2_roller11" pos="-0.008875 0.033122 0.010900">
+          <joint name="rwheel2_roller11_joint" type="hinge" axis="0.306094 0.082018 0.948462" damping="0.1" armature="0" limited="false"/>
+          <geom name="rwheel2_roller11_collision" type="sphere" size="0.0045" class="wheel_contact" mass="0.0001"/>
+        </body>
       </body>
 
       <!-- ==================== Depth Camera ==================== -->
@@ -269,17 +468,6 @@
     </body>
   </worldbody>
 
-  <!-- ==================== Mecanum Contact Pairs ==================== -->
-  <contact>
-    <pair geom1="lwheel1_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-    <pair geom1="rwheel1_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-    <pair geom1="lwheel2_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-    <pair geom1="rwheel2_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-  </contact>
 
   <!-- ==================== Gripper Mimic Constraints ==================== -->
   <equality>

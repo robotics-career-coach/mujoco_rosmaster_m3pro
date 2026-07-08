@@ -28,15 +28,15 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-iot.vscode-ros",
+        "Ranch-Hand-Robotics.rde-pack",
         "ms-vscode.cpptools",
         "ms-python.python",
         "redhat.vscode-xml",
         "redhat.vscode-yaml",
-        "smilerobotics.urdf"
+        "anthropic.claude-code"
       ],
       "settings": {
-        "ros.distro": "humble",
+        "ROS2.distro": "humble",
         "terminal.integrated.defaultProfile.linux": "bash",
         "files.associations": {
           "*.xacro": "xml",

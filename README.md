@@ -40,7 +40,7 @@ src/
 
 | Topic | Type | Description |
 |-------|------|-------------|
-| `/mecanum_drive_controller/cmd_vel_unstamped` | `geometry_msgs/Twist` | Base velocity (vx, vy, omega) |
+| `/mecanum_drive_controller/reference_unstamped` | `geometry_msgs/Twist` | Base velocity (vx, vy, omega) |
 | `/arm_controller/joint_trajectory` | `trajectory_msgs/JointTrajectory` | Arm trajectory commands |
 | `/gripper_controller/commands` | `std_msgs/Float64MultiArray` | Gripper position |
 
@@ -123,8 +123,42 @@ In a separate terminal:
 ```bash
 source install/setup.bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard \
-  --ros-args --remap cmd_vel:=/mecanum_drive_controller/cmd_vel_unstamped
+  --ros-args --remap cmd_vel:=/mecanum_drive_controller/reference_unstamped
 ```
+
+To verify commands are actually reaching the controller, watch the topic in a third terminal while pressing keys:
+
+```bash
+ros2 topic echo /mecanum_drive_controller/reference_unstamped
+```
+
+#### Keyboard bindings
+
+The mecanum base is holonomic, so it can strafe sideways as well as drive and turn. Hold **Shift** on the letter keys below to strafe instead of turning.
+
+| Key | Motion | Shift+Key | Motion |
+|-----|--------|-----------|--------|
+| `i` | Forward | `I` | Forward |
+| `,` | Backward | `<` | Backward |
+| `j` | Turn left (CCW) | `J` | Strafe left |
+| `l` | Turn right (CW) | `L` | Strafe right |
+| `u` | Forward + turn left | `U` | Forward + strafe left |
+| `o` | Forward + turn right | `O` | Forward + strafe right |
+| `m` | Backward + turn right | `M` | Backward + strafe left |
+| `.` | Backward + turn left | `>` | Backward + strafe right |
+| `t` | Up (+z, unused on ground base) | | |
+| `b` | Down (-z, unused on ground base) | | |
+| any other key | Stop | | |
+
+Speed adjustment:
+
+| Key | Effect |
+|-----|--------|
+| `q` / `z` | Increase / decrease both linear and angular speed by 10% |
+| `w` / `x` | Increase / decrease linear speed only by 10% |
+| `e` / `c` | Increase / decrease angular speed only by 10% |
+
+Default speed is 0.5 m/s linear, 1.0 rad/s angular. `Ctrl-C` quits and publishes a zero-velocity command on exit.
 
 ### View URDF in RViz (no simulation)
 

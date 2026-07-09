@@ -52,25 +52,31 @@ Visualization Manager:
       Name: RGB Camera
       Enabled: true
       Topic:
-        Value: /depth_camera/color/image_raw
+        Value: /depth_camera_rgb/color
 
     - Class: rviz_default_plugins/Image
       Name: Depth Camera
       Enabled: true
       Topic:
-        Value: /depth_camera/depth/image_raw
+        Value: /depth_camera_depth/depth
 
     - Class: rviz_default_plugins/Odometry
       Name: Odometry
       Enabled: true
       Topic:
-        Value: /mecanum_drive_controller/odom
-      Keep: 100
+        Value: /mecanum_drive_controller/odometry
+      Keep: 1
       Shape:
         Value: Arrow
+        Shaft Length: 0.08
+        Shaft Radius: 0.01
+        Head Length: 0.03
+        Head Radius: 0.02
+      Covariance:
+        Value: false
 
   Global Options:
-    Fixed Frame: odom
+    Fixed Frame: base_link
     Frame Rate: 30
 
   Views:

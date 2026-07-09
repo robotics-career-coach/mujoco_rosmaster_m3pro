@@ -72,6 +72,32 @@ ros2 launch m3pro_mujoco_sim sim.launch.py
 
 > **GUI note:** For MuJoCo viewer and RViz, you need X11 forwarding. On Linux/WSL2 this works out of the box. On macOS, install [XQuartz](https://www.xquartz.org/) and run `xhost +local:docker` first.
 
+### Git credentials in the dev container
+
+VS Code Dev Containers automatically forwards your host's git credentials and `.gitconfig` (name/email) into the container, so `git push`/`pull`/etc. work without leaving the container — no repo configuration needed. It just requires a one-time setup on your host machine first:
+
+**Option A: HTTPS with a credential helper (recommended — same steps work on all three OSes)**
+
+| Platform | Setup |
+|---|---|
+| Windows | Already set up — Git for Windows ships with Git Credential Manager (GCM) by default |
+| macOS | `brew install git-credential-manager` then `git-credential-manager configure` |
+| Ubuntu | `sudo apt install git-credential-manager` then `git-credential-manager configure` |
+
+After configuring, sign in once (`git pull` from any repo will prompt a browser login). VS Code transparently proxies credential requests from inside the container to this host helper.
+
+**Option B: SSH keys**
+
+Make sure an `ssh-agent` is running on your host with your key loaded:
+
+- **macOS**: `ssh-agent` runs by default — just run `ssh-add ~/.ssh/id_ed25519` (or your key path)
+- **Ubuntu**: `eval "$(ssh-agent -s)" && ssh-add`, and add that to `~/.bash_profile` so it persists across shells
+- **Windows**: in an admin PowerShell, `Set-Service ssh-agent -StartupType Automatic; Start-Service ssh-agent`, then `ssh-add` your key
+
+VS Code detects the running agent and forwards it into the container automatically, so `git@github.com:...` SSH remotes work as-is.
+
+> Don't try to hand-roll this with a `mounts` entry in `devcontainer.json` (like the X11 socket mount above) — an SSH agent is a Unix socket on Linux/macOS but a named pipe on Windows, so a hardcoded mount path won't work across all three platforms. Let VS Code's built-in forwarding handle it.
+
 ## Manual Setup (Ubuntu 22.04)
 
 ### Prerequisites

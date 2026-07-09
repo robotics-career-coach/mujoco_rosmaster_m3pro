@@ -10,14 +10,19 @@
   "remoteEnv": {
     "DISPLAY": "${localEnv:DISPLAY}",
     "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
-    "XDG_RUNTIME_DIR": "${localEnv:XDG_RUNTIME_DIR}",
-    "LIBGL_ALWAYS_SOFTWARE": "1"
+    "XDG_RUNTIME_DIR": "${localEnv:XDG_RUNTIME_DIR}"
+  },
+
+  "containerEnv": {
+    "NVIDIA_VISIBLE_DEVICES": "all",
+    "NVIDIA_DRIVER_CAPABILITIES": "all"
   },
 
   "runArgs": [
     "--network=host",
     "--ipc=host",
-    "--privileged"
+    "--privileged",
+    "--gpus=all"
   ],
 
   "mounts": [

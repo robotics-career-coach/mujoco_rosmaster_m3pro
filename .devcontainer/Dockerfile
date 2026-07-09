@@ -38,6 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglfw3-dev \
     libegl1-mesa-dev \
     libgl1-mesa-dri \
+    libglvnd0 \
     mesa-utils \
     # Dev tools
     git \

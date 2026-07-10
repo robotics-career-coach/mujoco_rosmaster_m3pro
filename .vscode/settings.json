@@ -1,3 +1,11 @@
 {
-    "cmake.sourceDirectory": "/home/nick/git/rcc/summer26/mujoco_rosmaster_m3pro/src/m3pro_description"
+    "cmake.sourceDirectory": "/home/nick/git/rcc/summer26/mujoco_rosmaster_m3pro/src/m3pro_description",
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
 }

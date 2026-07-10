@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install MuJoCo Python bindings for standalone testing
-RUN pip install --break-system-packages mujoco
+RUN pip install mujoco
 
 # Source ROS2 automatically
 RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USERNAME/.bashrc \

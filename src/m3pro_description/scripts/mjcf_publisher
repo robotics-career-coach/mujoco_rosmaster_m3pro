@@ -3,10 +3,64 @@
 import os
 import re
 import sys
+import xml.etree.ElementTree as ET
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, DurabilityPolicy, HistoryPolicy
 from std_msgs.msg import String
+
+
+def resolve_includes(xml_string, base_dir):
+    """Recursively resolve MuJoCo <include file="..."/> directives.
+
+    Replicates MuJoCo's native include semantics: matching sections have their
+    children appended; new sections are inserted at the include position.
+    Relative meshdir/assetdir paths in included files are made absolute.
+    """
+    root = ET.fromstring(xml_string)
+
+    while True:
+        include = root.find('include')
+        if include is None:
+            break
+
+        inc_file = include.get('file')
+        if not inc_file:
+            root.remove(include)
+            continue
+
+        inc_path = os.path.normpath(os.path.join(base_dir, inc_file))
+        inc_dir = os.path.dirname(inc_path)
+
+        with open(inc_path, 'r') as f:
+            inc_content = f.read()
+
+        resolved = resolve_includes(inc_content, inc_dir)
+        inc_root = ET.fromstring(resolved)
+
+        for compiler in inc_root.iter('compiler'):
+            for attr in ('meshdir', 'assetdir'):
+                val = compiler.get(attr)
+                if val and not os.path.isabs(val):
+                    compiler.set(attr, os.path.normpath(os.path.join(inc_dir, val)))
+
+        idx = list(root).index(include)
+        root.remove(include)
+
+        insert_offset = 0
+        for child in inc_root:
+            existing = root.find(child.tag)
+            if existing is not None:
+                for attr_name, attr_val in child.attrib.items():
+                    if attr_name not in existing.attrib:
+                        existing.set(attr_name, attr_val)
+                for sub in child:
+                    existing.append(sub)
+            else:
+                root.insert(idx + insert_offset, child)
+                insert_offset += 1
+
+    return ET.tostring(root, encoding='unicode')
 
 
 class MjcfPublisher(Node):
@@ -27,10 +81,12 @@ class MjcfPublisher(Node):
             self.get_logger().fatal(f'Cannot read MJCF file: {e}')
             sys.exit(1)
 
-        # MuJoCo has no file path anchor when loading from a string, so relative
-        # meshdir/assetdir values fail. Rewrite them to absolute paths.
         mjcf_dir = os.path.dirname(os.path.abspath(mjcf_path))
 
+        mjcf_content = resolve_includes(mjcf_content, mjcf_dir)
+
+        # MuJoCo has no file path anchor when loading from a string, so relative
+        # meshdir/assetdir values fail. Rewrite them to absolute paths.
         def abs_attr(match):
             attr, rel = match.group(1), match.group(2)
             abs_path = os.path.normpath(os.path.join(mjcf_dir, rel))

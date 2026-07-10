@@ -5,3 +5,6 @@
 build/
 install/
 log/
+
+# VS Code C/C++ IntelliSense database (local, regenerated per machine)
+.vscode/browse.vc.db*

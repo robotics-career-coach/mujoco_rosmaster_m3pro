@@ -18,7 +18,9 @@ MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yah
 ```
 src/
 ├── m3pro_description/       # Robot model package
-│   ├── mjcf/m3pro.xml       # MuJoCo model (primary simulation model)
+│   ├── mjcf/
+│   │   ├── m3pro_robot.xml      # Robot definition (body tree, actuators, sensors)
+│   │   └── scene_*.xml          # Scene files (empty, basic) that <include> the robot
 │   ├── urdf/                # Plain URDF for robot_state_publisher & ros2_control
 │   ├── meshes/              # STL mesh files from Yahboom CAD
 │   ├── rviz/                # RViz display config
@@ -67,10 +69,13 @@ The easiest way to get started on any OS — all dependencies are pre-installed:
 
 ```bash
 source install/setup.bash
-ros2 launch m3pro_mujoco_sim sim.launch.py
+ros2 launch m3pro_mujoco_sim sim.launch.py                # empty scene (default)
+ros2 launch m3pro_mujoco_sim sim.launch.py scene:=basic   # scene with objects
 ```
 
 > **GUI note:** For MuJoCo viewer and RViz, you need X11 forwarding. On Linux/WSL2 this works out of the box. On macOS, install [XQuartz](https://www.xquartz.org/) and run `xhost +local:docker` first.
+
+> **GPU note:** `.devcontainer/devcontainer.json` requests `--gpus=all`, which requires an NVIDIA GPU with the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) installed on the host (Docker Desktop on Windows/WSL2 sets this up for you if you have an NVIDIA GPU). If your machine has no NVIDIA GPU, container startup will fail with a "could not select device driver" error — remove the `--gpus=all` entry (and the `NVIDIA_VISIBLE_DEVICES`/`NVIDIA_DRIVER_CAPABILITIES` container env vars) from `devcontainer.json` to run on CPU-only rendering instead.
 
 ### Git credentials in the dev container
 
@@ -133,14 +138,18 @@ source install/setup.bash
 ### Launch simulation with MuJoCo viewer
 
 ```bash
-ros2 launch m3pro_mujoco_sim sim.launch.py
+ros2 launch m3pro_mujoco_sim sim.launch.py                # empty scene (default)
+ros2 launch m3pro_mujoco_sim sim.launch.py scene:=basic   # scene with objects
 ```
 
 ### Launch simulation with RViz
 
 ```bash
-ros2 launch m3pro_mujoco_sim sim_with_rviz.launch.py
+ros2 launch m3pro_mujoco_sim sim_with_rviz.launch.py                # empty scene (default)
+ros2 launch m3pro_mujoco_sim sim_with_rviz.launch.py scene:=basic   # scene with objects
 ```
+
+The `scene` argument maps to `mjcf/scene_<value>.xml` in `m3pro_description` — see [Repository Structure](#repository-structure) above.
 
 ### Drive the robot with keyboard teleop
 
@@ -199,7 +208,7 @@ The simulation uses `ros-controls/mujoco_ros2_control` as the bridge between MuJ
 ```
 ┌─────────────────────────────────────────────┐
 │  MuJoCo Physics Engine                      │
-│  (m3pro.xml — MJCF model)                   │
+│  (scene_*.xml + m3pro_robot.xml — MJCF)     │
 └──────────────┬──────────────────────────────┘
                │ MujocoSystemInterface
 ┌──────────────┴──────────────────────────────┐

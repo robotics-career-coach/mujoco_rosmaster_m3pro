@@ -1,0 +1,359 @@
+#!/usr/bin/env python3
+"""Task-space keyboard jog teleop for an arm exposed via ros2_control.
+
+Builds a PyKDL kinematic chain directly from the robot's URDF (published on
+/robot_description by robot_state_publisher, in both sim and on real hardware)
+and uses PyKDL's Levenberg-Marquardt IK solver to convert Cartesian jog
+commands into joint targets, which are streamed to a JointTrajectoryController
+and a JointGroupPositionController (gripper). No SRDF/MoveIt required.
+"""
+import select
+import sys
+import termios
+import threading
+import tty
+
+import PyKDL
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Float64MultiArray, String
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from urdf_parser_py.urdf import URDF
+
+# key -> (kind, axis_index_or_none, sign)
+# kind: 'trans' (x/y/z index 0/1/2), 'rot' (pitch/yaw), 'gripper'
+KEY_BINDINGS = {
+    'w': ('trans', 0, +1), 's': ('trans', 0, -1),
+    'a': ('trans', 1, +1), 'd': ('trans', 1, -1),
+    'r': ('trans', 2, +1), 'f': ('trans', 2, -1),
+    't': ('rot', 'pitch', +1), 'g': ('rot', 'pitch', -1),
+    'y': ('rot', 'yaw', +1), 'h': ('rot', 'yaw', -1),
+    'u': ('gripper', None, +1), 'j': ('gripper', None, -1),
+}
+HOME_KEY = '0'
+QUIT_KEYS = ('\x03',)  # Ctrl-C
+
+BANNER = """
+M3 Pro Arm Teleop (task-space jog)
+-----------------------------------
+Translation (base frame, step={trans_step:.3f} m):
+  +x forward   w      -x back    s
+  +y left      a      -y right   d
+  +z up        r      -z down    f
+
+Rotation (step={rot_step:.3f} rad, no roll -- see README):
+  +pitch       t      -pitch     g
+  +yaw         y      -yaw       h
+
+Gripper (step={grip_step:.3f} rad):
+  open         u      close      j
+
+  0       : go to home pose
+  CTRL-C  : quit (arm holds last commanded pose)
+
+Unreachable targets / joint-limit violations are rejected (last good pose
+is held) rather than applied.
+"""
+
+
+def urdf_pose_to_kdl_frame(origin):
+    if origin is None:
+        return PyKDL.Frame()
+    xyz = origin.xyz or [0.0, 0.0, 0.0]
+    rpy = origin.rpy or [0.0, 0.0, 0.0]
+    return PyKDL.Frame(PyKDL.Rotation.RPY(*rpy), PyKDL.Vector(*xyz))
+
+
+def urdf_joint_to_kdl_joint(joint):
+    if joint.type == 'fixed':
+        return PyKDL.Joint(joint.name, PyKDL.Joint.Fixed)
+    axis = joint.axis or [1.0, 0.0, 0.0]
+    origin = PyKDL.Vector(0.0, 0.0, 0.0)
+    if joint.type in ('revolute', 'continuous'):
+        return PyKDL.Joint(joint.name, origin, PyKDL.Vector(*axis), PyKDL.Joint.RotAxis)
+    if joint.type == 'prismatic':
+        return PyKDL.Joint(joint.name, origin, PyKDL.Vector(*axis), PyKDL.Joint.TransAxis)
+    raise ValueError(f"Unsupported joint type '{joint.type}' on joint '{joint.name}'")
+
+
+def build_kdl_chain(urdf_string, root_link, tip_link):
+    """Build a PyKDL.Chain for the root->tip serial chain in a URDF.
+
+    Returns (chain, moving_joint_names) where moving_joint_names gives the
+    joint name backing each entry of a PyKDL.JntArray for this chain (fixed
+    joints contribute a segment but no JntArray entry).
+    """
+    robot = URDF.from_xml_string(urdf_string)
+    joint_names_in_chain = robot.get_chain(root_link, tip_link, joints=True, links=False, fixed=True)
+
+    chain = PyKDL.Chain()
+    moving_joint_names = []
+    for joint_name in joint_names_in_chain:
+        joint = robot.joint_map[joint_name]
+        kdl_joint = urdf_joint_to_kdl_joint(joint)
+        kdl_frame = urdf_pose_to_kdl_frame(joint.origin)
+        chain.addSegment(PyKDL.Segment(joint.child, kdl_joint, kdl_frame))
+        if joint.type != 'fixed':
+            moving_joint_names.append(joint_name)
+
+    return chain, moving_joint_names, robot
+
+
+class ArmTeleopKeyboard(Node):
+
+    def __init__(self):
+        super().__init__('arm_teleop_keyboard')
+
+        self.declare_parameter('root_link', 'base_link')
+        self.declare_parameter('tip_link', 'gripping_housing')
+        self.declare_parameter('gripper_joint_name', 'rlink1_joint')
+        self.declare_parameter('translation_step', 0.01)
+        self.declare_parameter('rotation_step', 0.05)
+        self.declare_parameter('gripper_step', 0.05)
+        self.declare_parameter('time_from_start', 0.2)
+        self.declare_parameter('ik_position_tolerance', 0.005)
+        self.declare_parameter('ik_orientation_tolerance', 0.1)
+        self.declare_parameter('arm_trajectory_topic', '/arm_controller/joint_trajectory')
+        self.declare_parameter('gripper_command_topic', '/gripper_controller/commands')
+        self.declare_parameter('joint_states_topic', '/joint_states')
+        self.declare_parameter('robot_description_topic', '/robot_description')
+        self.declare_parameter('home_gripper_position', 0.0)
+
+        self.root_link = self.get_parameter('root_link').value
+        self.tip_link = self.get_parameter('tip_link').value
+        self.gripper_joint_name = self.get_parameter('gripper_joint_name').value
+        self.translation_step = self.get_parameter('translation_step').value
+        self.rotation_step = self.get_parameter('rotation_step').value
+        self.gripper_step = self.get_parameter('gripper_step').value
+        self.time_from_start = self.get_parameter('time_from_start').value
+        self.ik_position_tolerance = self.get_parameter('ik_position_tolerance').value
+        self.ik_orientation_tolerance = self.get_parameter('ik_orientation_tolerance').value
+        self.home_gripper_position = self.get_parameter('home_gripper_position').value
+
+        arm_topic = self.get_parameter('arm_trajectory_topic').value
+        gripper_topic = self.get_parameter('gripper_command_topic').value
+        joint_states_topic = self.get_parameter('joint_states_topic').value
+        robot_description_topic = self.get_parameter('robot_description_topic').value
+
+        self.chain = None
+        self.moving_joint_names = None
+        self.joint_limits = {}
+        self.gripper_limits = (0.0, 0.0)
+        self.fk_solver = None
+        self.ik_solver = None
+
+        self.q_seed = None
+        self.target_frame = None
+        self.gripper_target = None
+
+        self._urdf_ready = threading.Event()
+        self._urdf_string = None
+        self._joint_state_ready = threading.Event()
+        self._last_joint_state = None
+
+        transient_local_qos = QoSProfile(
+            depth=1,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+        )
+        self.create_subscription(String, robot_description_topic, self._on_robot_description, transient_local_qos)
+        self.create_subscription(JointState, joint_states_topic, self._on_joint_state, 10)
+
+        self.arm_pub = self.create_publisher(JointTrajectory, arm_topic, 10)
+        self.gripper_pub = self.create_publisher(Float64MultiArray, gripper_topic, 10)
+
+    def _on_robot_description(self, msg):
+        if self._urdf_string is None:
+            self._urdf_string = msg.data
+            self._urdf_ready.set()
+
+    def _on_joint_state(self, msg):
+        self._last_joint_state = msg
+        if not self._joint_state_ready.is_set():
+            self._joint_state_ready.set()
+
+    def wait_for_urdf(self):
+        while not self._urdf_ready.wait(timeout=2.0):
+            self.get_logger().info('Waiting for /robot_description...')
+
+    def wait_for_joint_states(self):
+        while not self._joint_state_ready.wait(timeout=2.0):
+            self.get_logger().info('Waiting for /joint_states...')
+
+    def build_kinematics(self):
+        chain, moving_joint_names, robot = build_kdl_chain(self._urdf_string, self.root_link, self.tip_link)
+        self.chain = chain
+        self.moving_joint_names = moving_joint_names
+        self.fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
+        # A 5-joint chain cannot exactly satisfy an arbitrary 6-DOF pose, so KDL's
+        # own internal convergence flag is nearly always "failed" even when the
+        # achieved pose is well within a millimeter/fraction-of-a-degree of the
+        # target (verified empirically). eps/maxiter are loosened from the KDL
+        # defaults to help it try harder, but the real accept/reject decision in
+        # try_move_to() is made against ik_position_tolerance/ik_orientation_tolerance,
+        # not this solver's return code.
+        self.ik_solver = PyKDL.ChainIkSolverPos_LMA(chain, 1e-4, 500, 1e-15)
+
+        for name in moving_joint_names:
+            limit = robot.joint_map[name].limit
+            self.joint_limits[name] = (limit.lower, limit.upper)
+
+        gripper_limit = robot.joint_map[self.gripper_joint_name].limit
+        self.gripper_limits = (gripper_limit.lower, gripper_limit.upper)
+
+        self.get_logger().info(
+            f'Built KDL chain {self.root_link} -> {self.tip_link} '
+            f'with {len(moving_joint_names)} joints: {moving_joint_names}'
+        )
+
+    def seed_from_joint_states(self):
+        positions = dict(zip(self._last_joint_state.name, self._last_joint_state.position))
+        self.q_seed = PyKDL.JntArray(len(self.moving_joint_names))
+        for i, name in enumerate(self.moving_joint_names):
+            self.q_seed[i] = positions.get(name, 0.0)
+
+        self.target_frame = PyKDL.Frame()
+        self.fk_solver.JntToCart(self.q_seed, self.target_frame)
+        self.gripper_target = self.clamp(
+            positions.get(self.gripper_joint_name, 0.0), self.gripper_limits
+        )
+
+    @staticmethod
+    def clamp(value, limits):
+        lo, hi = limits
+        return max(lo, min(hi, value))
+
+    def try_move_to(self, candidate_frame):
+        """Attempt to IK-solve candidate_frame; accept and publish only if every
+        joint stays within its URDF limit AND the achieved pose (via FK on the
+        IK solution) is within tolerance of the requested one. The solver's own
+        return code is deliberately ignored here -- see the comment in
+        build_kinematics() for why. Returns True if accepted."""
+        q_out = PyKDL.JntArray(len(self.moving_joint_names))
+        self.ik_solver.CartToJnt(self.q_seed, candidate_frame, q_out)
+
+        for i, name in enumerate(self.moving_joint_names):
+            lo, hi = self.joint_limits[name]
+            if not (lo <= q_out[i] <= hi):
+                self.get_logger().warn(
+                    f'IK solution violates limit on {name} ({q_out[i]:.3f} not in [{lo:.3f}, {hi:.3f}]); '
+                    'command rejected', throttle_duration_sec=1.0,
+                )
+                return False
+
+        achieved_frame = PyKDL.Frame()
+        self.fk_solver.JntToCart(q_out, achieved_frame)
+        error = PyKDL.diff(candidate_frame, achieved_frame)
+        if error.vel.Norm() > self.ik_position_tolerance or error.rot.Norm() > self.ik_orientation_tolerance:
+            self.get_logger().warn(
+                f'Target pose unreachable within tolerance (pos err {error.vel.Norm():.4f} m, '
+                f'rot err {error.rot.Norm():.4f} rad); command rejected', throttle_duration_sec=1.0,
+            )
+            return False
+
+        self.q_seed = q_out
+        self.target_frame = achieved_frame
+        self.publish_arm()
+        return True
+
+    def publish_arm(self):
+        msg = JointTrajectory()
+        msg.joint_names = list(self.moving_joint_names)
+        point = JointTrajectoryPoint()
+        point.positions = [self.q_seed[i] for i in range(len(self.moving_joint_names))]
+        seconds = int(self.time_from_start)
+        nanoseconds = int((self.time_from_start - seconds) * 1e9)
+        point.time_from_start.sec = seconds
+        point.time_from_start.nanosec = nanoseconds
+        msg.points = [point]
+        self.arm_pub.publish(msg)
+
+    def publish_gripper(self):
+        self.gripper_pub.publish(Float64MultiArray(data=[self.gripper_target]))
+
+    def go_home(self):
+        home_q = PyKDL.JntArray(len(self.moving_joint_names))
+        home_frame = PyKDL.Frame()
+        self.fk_solver.JntToCart(home_q, home_frame)
+        self.q_seed = home_q
+        self.target_frame = home_frame
+        self.publish_arm()
+
+        self.gripper_target = self.clamp(self.home_gripper_position, self.gripper_limits)
+        self.publish_gripper()
+
+    def handle_key(self, key):
+        if key == HOME_KEY:
+            self.go_home()
+            return
+
+        binding = KEY_BINDINGS.get(key)
+        if binding is None:
+            return
+        kind, axis, sign = binding
+
+        if kind == 'gripper':
+            self.gripper_target = self.clamp(
+                self.gripper_target + sign * self.gripper_step, self.gripper_limits
+            )
+            self.publish_gripper()
+            return
+
+        candidate = PyKDL.Frame(self.target_frame)
+        if kind == 'trans':
+            delta = [0.0, 0.0, 0.0]
+            delta[axis] = sign * self.translation_step
+            candidate.p = self.target_frame.p + PyKDL.Vector(*delta)
+        elif kind == 'rot':
+            dpitch = sign * self.rotation_step if axis == 'pitch' else 0.0
+            dyaw = sign * self.rotation_step if axis == 'yaw' else 0.0
+            candidate.M = PyKDL.Rotation.RPY(0.0, dpitch, dyaw) * self.target_frame.M
+
+        self.try_move_to(candidate)
+
+
+def get_key(settings, timeout):
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], timeout)
+    key = sys.stdin.read(1) if rlist else ''
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+
+def main():
+    settings = termios.tcgetattr(sys.stdin)
+
+    rclpy.init()
+    node = ArmTeleopKeyboard()
+    spin_thread = threading.Thread(target=rclpy.spin, args=(node,), daemon=True)
+    spin_thread.start()
+
+    try:
+        node.wait_for_urdf()
+        node.build_kinematics()
+        node.wait_for_joint_states()
+        node.seed_from_joint_states()
+
+        print(BANNER.format(
+            trans_step=node.translation_step,
+            rot_step=node.rotation_step,
+            grip_step=node.gripper_step,
+        ))
+
+        while rclpy.ok():
+            key = get_key(settings, 0.1)
+            if key == '':
+                continue
+            if key in QUIT_KEYS:
+                break
+            node.handle_key(key)
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

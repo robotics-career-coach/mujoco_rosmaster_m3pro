@@ -30,6 +30,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-teleop-twist-keyboard \
     # MuJoCo ros2_control integration
     ros-humble-mujoco-ros2-control \
+    # Arm teleop IK (m3pro_arm_teleop)
+    ros-humble-python-orocos-kdl-vendor \
+    ros-humble-urdfdom-py \
     # Build tools
     python3-colcon-common-extensions \
     python3-rosdep \

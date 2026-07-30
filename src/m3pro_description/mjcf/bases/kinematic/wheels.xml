@@ -1,0 +1,56 @@
+<mujocoinclude>
+  <!--
+    "Ghost" base: no wheel-ground contact at all. Propulsion comes entirely from
+    the fixed-tendon equality constraints in planar_drive.xml, which hold
+    base_link's x/y/yaw joints to the exact mecanum forward-kinematics
+    combination of these same four wheel joints: so mecanum_drive_controller's
+    commands and odometry keep working unchanged, but there is no contact solver
+    involved in propulsion at all (wheel geoms below are contype=0/conaffinity=0,
+    visual only). This is the maximally-smooth option: no traction/slip modeling,
+    useful when base contact dynamics aren't what's being tested.
+  -->
+
+  <!-- Front-left wheel -->
+  <body name="lwheel1" pos="0.0775754 0.09775 0.04" quat="0.707107 0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="lwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="lwheel1_visual" type="mesh" mesh="lwheel1" class="visual"
+          material="black_rubber"/>
+    <geom name="lwheel1_collision" type="cylinder" size="0.0320 0.0275"
+          pos="0 0 0.0109" contype="0" conaffinity="0" group="3" rgba="0.5 0.5 0.5 0.3"/>
+  </body>
+
+  <!-- Front-right wheel -->
+  <body name="rwheel1" pos="0.0775754 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="rwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="rwheel1_visual" type="mesh" mesh="rwheel1" class="visual"
+          material="black_rubber"/>
+    <geom name="rwheel1_collision" type="cylinder" size="0.0320 0.0275"
+          pos="0 0 0.0109" contype="0" conaffinity="0" group="3" rgba="0.5 0.5 0.5 0.3"/>
+  </body>
+
+  <!-- Rear-left wheel -->
+  <body name="lwheel2" pos="-0.0814246 0.09775 0.04" quat="0.707107 0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="lwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="lwheel2_visual" type="mesh" mesh="lwheel2" class="visual"
+          material="black_rubber"/>
+    <geom name="lwheel2_collision" type="cylinder" size="0.0320 0.0275"
+          pos="0 0 0.0109" contype="0" conaffinity="0" group="3" rgba="0.5 0.5 0.5 0.3"/>
+  </body>
+
+  <!-- Rear-right wheel -->
+  <body name="rwheel2" pos="-0.0814246 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="rwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="rwheel2_visual" type="mesh" mesh="rwheel2" class="visual"
+          material="black_rubber"/>
+    <geom name="rwheel2_collision" type="cylinder" size="0.0320 0.0275"
+          pos="0 0 0.0109" contype="0" conaffinity="0" group="3" rgba="0.5 0.5 0.5 0.3"/>
+  </body>
+</mujocoinclude>

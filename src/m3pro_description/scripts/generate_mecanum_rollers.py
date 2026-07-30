@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 """
-Generates passive-roller mecanum wheel geometry and splices it into
-m3pro_robot.xml -- the robot definition actually <include>d by scene_*.xml
-and loaded by the running simulation.
+Regenerates the passive-roller mecanum wheel geometry inside
+mjcf/bases/mecanum/wheels.xml -- the fragment the "mecanum" base variant
+<include>s for its four wheel bodies (see mjcf/m3pro_robot_mecanum.xml).
 
-Replaces the single-cylinder + anisotropic-friction-cone wheel approximation with
-a wheel hub cylinder plus N free-spinning passive roller bodies around its rim,
-following the approach demonstrated in https://github.com/JunHeonYoon/mujoco_mecanum.
+Replaces each wheel's hub-collision-geom + roller-bodies block with a freshly
+computed one, following the approach demonstrated in
+https://github.com/JunHeonYoon/mujoco_mecanum. Use this after changing
+NUM_ROLLERS/ROLLER_RADIUS/etc. below, not for a one-off hand edit.
 
 Run manually (dev-time codegen, not built/installed):
     python3 src/m3pro_description/scripts/generate_mecanum_rollers.py [--dry-run]
-
-Re-running against an already-migrated file: `git checkout -- <mjcf-path>` first
-(check out a pre-migration commit of m3pro_robot.xml, i.e. one predating the
-roller splice, not just the working-tree copy).
 """
 
 import argparse
@@ -21,7 +18,6 @@ import itertools
 import math
 import re
 import sys
-import tempfile
 from pathlib import Path
 
 # Wheel body name -> roller handedness (+1/-1). Diagonal pairs (FL/RR, FR/RL)
@@ -36,7 +32,7 @@ WHEELS = [
     ("rwheel2", 1),  # rear-right
 ]
 
-# Geometry shared by all 4 wheels (must match the existing cylinder in m3pro_robot.xml).
+# Geometry shared by all 4 wheels (must match the existing hub cylinder in wheels.xml).
 WHEEL_RADIUS = 0.04  # matches controllers.yaml's kinematics.wheels_radius (nominal)
 HALF_HEIGHT = 0.0275
 HUB_Z = 0.0109
@@ -139,145 +135,76 @@ def check_overlap(rollers):
 def render_wheel_block(wheel_name, hub_radius, rollers):
     lines = []
     lines.append(
-        f'        <geom name="{wheel_name}_collision" type="cylinder" size="{hub_radius:.4f} {HALF_HEIGHT}"'
+        f'    <geom name="{wheel_name}_collision" type="cylinder" size="{hub_radius:.4f} {HALF_HEIGHT}"'
     )
-    lines.append(f'              pos="0 0 {HUB_Z}" class="wheel_contact"/>')
+    lines.append(f'          pos="0 0 {HUB_Z}" class="wheel_contact"/>')
     for i, (pos, axis) in enumerate(rollers):
         lines.append(
-            f'        <body name="{wheel_name}_roller{i}" pos="{pos[0]:.6f} {pos[1]:.6f} {pos[2]:.6f}">'
+            f'    <body name="{wheel_name}_roller{i}" pos="{pos[0]:.6f} {pos[1]:.6f} {pos[2]:.6f}">'
         )
         lines.append(
-            f'          <joint name="{wheel_name}_roller{i}_joint" type="hinge" '
+            f'      <joint name="{wheel_name}_roller{i}_joint" type="hinge" '
             f'axis="{axis[0]:.6f} {axis[1]:.6f} {axis[2]:.6f}" '
             f'damping="{ROLLER_DAMPING}" armature="0" limited="false"/>'
         )
         lines.append(
-            f'          <geom name="{wheel_name}_roller{i}_collision" type="sphere" '
+            f'      <geom name="{wheel_name}_roller{i}_collision" type="sphere" '
             f'size="{ROLLER_RADIUS}" class="wheel_contact" mass="{ROLLER_MASS}"/>'
         )
-        lines.append("        </body>")
+        lines.append("    </body>")
     return "\n".join(lines)
 
 
 def splice(xml_text, hub_radius, a, step):
-    # 1. Drop cone="elliptic" if present in this file -- it only existed to support
-    #    the anisotropic <pair> friction overrides being removed below. m3pro_robot.xml
-    #    itself has no <option> (that lives in the including scene_*.xml files), so this
-    #    is a no-op there; it's cone="elliptic" in the scene files that should be dropped
-    #    separately once the roller migration lands.
-    xml_text = re.sub(r'\s*cone="elliptic"', "", xml_text, count=1)
-
-    # 2. Add the wheel_contact default class after the existing collision class.
-    collision_default = '    <default class="collision">\n      <geom group="3" rgba="0.5 0.5 0.5 0.3"/>\n    </default>'
-    if collision_default not in xml_text:
-        raise SystemExit("could not find the collision default block to anchor the new wheel_contact class")
-    wheel_contact_default = (
-        collision_default
-        + "\n\n"
-        + '    <default class="wheel_contact">\n'
-        + '      <geom contype="1" conaffinity="0" group="3" rgba="0.5 0.5 0.5 0.3"/>\n'
-        + "    </default>"
-    )
-    xml_text = xml_text.replace(collision_default, wheel_contact_default, 1)
-
-    # 3. Replace each wheel's 3-line collision geom with the new hub geom + rollers.
+    # Replace each wheel's hub-collision-geom + roller-bodies block. Anchored on
+    # the hub geom (fixed name/type/pos, only its size varies) through the last
+    # roller body's closing tag; roller bodies are flat (no nesting inside them),
+    # so this doesn't need balanced-tag parsing, just a non-greedy repeat of the
+    # 4-line roller-body pattern.
     for wheel_name, direction in WHEELS:
         rollers = rollers_for_wheel(direction, a, step)
         check_overlap(rollers)
         replacement = render_wheel_block(wheel_name, hub_radius, rollers)
 
         pattern = re.compile(
-            r'        <geom name="' + re.escape(wheel_name) + r'_collision" type="cylinder" size="0\.04 0\.0275"\n'
-            r'              pos="0 0 0\.0109" class="collision"\n'
-            r'              condim="4" friction="1\.0 0\.3 0\.001" priority="1"/>'
+            r'    <geom name="' + re.escape(wheel_name) + r'_collision" type="cylinder" size="[0-9.]+ [0-9.]+"\n'
+            r'          pos="0 0 [0-9.]+" class="wheel_contact"/>\n'
+            r'(?:    <body name="' + re.escape(wheel_name) + r'_roller\d+" pos="[^"]+">\n'
+            r'      <joint name="' + re.escape(wheel_name) + r'_roller\d+_joint"[^\n]*/>\n'
+            r'      <geom name="' + re.escape(wheel_name) + r'_roller\d+_collision"[^\n]*/>\n'
+            r"    </body>\n)+"
         )
-        new_text, n = pattern.subn(replacement, xml_text, count=1)
+        new_text, n = pattern.subn(replacement + "\n", xml_text, count=1)
         if n != 1:
-            raise SystemExit(f"could not find the existing collision geom block for {wheel_name}")
+            raise SystemExit(f"could not find the existing hub+roller block for {wheel_name}")
         xml_text = new_text
-
-    # 4. Remove the <contact> block of wheel-ground anisotropic friction pairs.
-    #    No comment header precedes it in m3pro_robot.xml, so don't require one.
-    contact_pattern = re.compile(
-        r"\n  <contact>\n"
-        r'(?:    <pair geom1="\w+" geom2="ground"\n'
-        r'          condim="4" friction="[0-9. ]+"/>\n)+'
-        r"  </contact>\n",
-    )
-    new_text, n = contact_pattern.subn("\n", xml_text, count=1)
-    if n != 1:
-        raise SystemExit("could not find the <contact> block of mecanum pair overrides to remove")
-    xml_text = new_text
-
-    # 5. Insert the wheel-layout doc comment describing the new approach + caveat,
-    #    right before the first wheel body. Replaces the old comment if one is
-    #    already present (e.g. re-running against a file this script previously
-    #    migrated), otherwise inserts fresh -- pre-migration m3pro_robot.xml has no
-    #    such comment block at all, just a bare "<!-- Front-left wheel -->".
-    new_comment = (
-        "      <!--\n"
-        "        Wheel layout (top-down, +X is front):\n"
-        "          lwheel1 (FL)  ___  rwheel1 (FR)\n"
-        "                       |   |\n"
-        "          lwheel2 (RL)  ===  rwheel2 (RR)\n"
-        "\n"
-        f"        Mecanum X-pattern via {NUM_ROLLERS} passive free-spinning roller bodies per wheel\n"
-        "        (see scripts/generate_mecanum_rollers.py), not friction anisotropy. Roller count/\n"
-        "        radius/tilt are a simulation approximation, not a reverse-engineered match to the\n"
-        "        real ROSMASTER M3 Pro's physical roller wheels. The pin-placement radius is solved\n"
-        f"        (not just WHEEL_RADIUS - ROLLER_RADIUS) so the effective rolling radius lands\n"
-        f"        exactly on the nominal {WHEEL_RADIUS} m used in controllers.yaml's kinematics;\n"
-        "        see the cos(step/2) note in compute_geometry() before changing roller count/radius.\n"
-        "        NUM_ROLLERS is a deliberate smoothness/grip-authority trade-off; see the design note\n"
-        "        in the generator script and CLAUDE.md before changing it.\n"
-        "      -->\n\n"
-    )
-    wheel_anchor = '      <!-- Front-left wheel -->'
-    old_comment_pattern = re.compile(r"      <!--\n(?:.*\n)*?      -->\n\n(?=      <!-- Front-left wheel -->)")
-    if old_comment_pattern.search(xml_text):
-        xml_text = old_comment_pattern.sub(new_comment, xml_text, count=1)
-    elif wheel_anchor in xml_text:
-        xml_text = xml_text.replace(wheel_anchor, new_comment + wheel_anchor, 1)
-    else:
-        raise SystemExit("could not find the Front-left wheel comment to anchor the wheel-layout doc comment")
 
     return xml_text
 
 
-def validate_with_mujoco(xml_text):
+def validate_with_mujoco(wheels_xml_path):
+    """Load the real scene through the wheels.xml candidate via MuJoCo's own
+    native (file-path-based) include resolution -- the same nested-include
+    support the running simulation's mjcf_publisher replicates, but exercised
+    directly against a real file so this doesn't need a temp directory shim."""
     import mujoco
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # meshdir="../meshes" is relative to the mjcf file's own directory, so
-        # mirror the real mjcf/ + meshes/ sibling layout under the temp root.
-        tmp_root = Path(tmpdir)
-        mjcf_dir = tmp_root / "mjcf"
-        mjcf_dir.mkdir()
-        tmp_path = mjcf_dir / "m3pro_candidate.xml"
-        tmp_path.write_text(xml_text)
-        real_meshdir = (Path(__file__).parent.parent / "meshes").resolve()
-        (tmp_root / "meshes").symlink_to(real_meshdir)
-        mujoco.MjModel.from_xml_path(str(tmp_path))
+    scene_path = wheels_xml_path.parent.parent.parent / "scene_empty_mecanum.xml"
+    mujoco.MjModel.from_xml_path(str(scene_path))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mjcf-path",
-        default=str(Path(__file__).parent.parent / "mjcf" / "m3pro_robot.xml"),
-        help="Path to m3pro_robot.xml (default: the package's own mjcf/m3pro_robot.xml)",
+        default=str(Path(__file__).parent.parent / "mjcf" / "bases" / "mecanum" / "wheels.xml"),
+        help="Path to bases/mecanum/wheels.xml (default: the package's own copy)",
     )
     parser.add_argument("--dry-run", action="store_true", help="Print result to stdout instead of writing the file")
     args = parser.parse_args()
 
     mjcf_path = Path(args.mjcf_path)
     xml_text = mjcf_path.read_text()
-
-    if "wheel_contact" in xml_text or "_roller0" in xml_text:
-        raise SystemExit(
-            f"{mjcf_path} already appears migrated (found 'wheel_contact' or '_roller0'). "
-            f"Run `git checkout <pre-migration-commit> -- {mjcf_path}` first if you want to regenerate."
-        )
 
     a, step, reach, hub_radius = compute_geometry()
     print(
@@ -291,15 +218,16 @@ def main():
 
     new_text = splice(xml_text, hub_radius, a, step)
 
-    print("Validating candidate XML with mujoco.MjModel.from_xml_path...", file=sys.stderr)
-    validate_with_mujoco(new_text)
-    print("Validation OK.", file=sys.stderr)
-
     if args.dry_run:
         print(new_text)
-    else:
-        mjcf_path.write_text(new_text)
-        print(f"Wrote {mjcf_path}", file=sys.stderr)
+        return
+
+    mjcf_path.write_text(new_text)
+    print(f"Wrote {mjcf_path}", file=sys.stderr)
+
+    print("Validating via scene_empty_mecanum.xml with mujoco.MjModel.from_xml_path...", file=sys.stderr)
+    validate_with_mujoco(mjcf_path)
+    print("Validation OK.", file=sys.stderr)
 
 
 if __name__ == "__main__":

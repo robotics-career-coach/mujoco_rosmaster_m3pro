@@ -1,0 +1,32 @@
+<mujocoinclude>
+  <asset>
+    <material name="black_aluminum" rgba="0.2 0.2 0.22 1" specular="0.6" shininess="0.3" reflectance="0.08"/>
+    <material name="green_pcb" rgba="0.0 0.5 0.18 1" specular="0.3" shininess="0.2"/>
+    <material name="black_rubber" rgba="0.22 0.22 0.22 1" specular="0.1" shininess="0.05"/>
+    <material name="blue_servo" rgba="0.15 0.35 0.7 1" specular="0.5" shininess="0.4"/>
+    <material name="silver_bracket" rgba="0.75 0.75 0.78 1" specular="0.7" shininess="0.5" reflectance="0.1"/>
+    <material name="dark_plastic" rgba="0.18 0.18 0.18 1" specular="0.3" shininess="0.2"/>
+    <material name="camera_body" rgba="0.22 0.22 0.24 1" specular="0.4" shininess="0.3"/>
+
+    <mesh name="base_link" file="base_link.stl"/>
+    <mesh name="arm_base_Link" file="arm_base_Link.stl"/>
+    <mesh name="arm1" file="arm1.stl"/>
+    <mesh name="arm2" file="arm2.stl"/>
+    <mesh name="arm3" file="arm3.stl"/>
+    <mesh name="arm4" file="arm4.stl"/>
+    <mesh name="arm5" file="arm5.stl"/>
+    <mesh name="rlink1" file="rlink1.stl"/>
+    <mesh name="rlink2" file="rlink2.stl"/>
+    <mesh name="llink1" file="llink1.stl"/>
+    <mesh name="llink2" file="llink2.stl"/>
+    <mesh name="rlink3" file="rlink3.stl"/>
+    <mesh name="llink3" file="llink3.stl"/>
+    <mesh name="Gripping" file="Gripping.stl"/>
+    <mesh name="DCW2" file="DCW2.stl"/>
+    <mesh name="Camera" file="Camera.stl"/>
+    <mesh name="lwheel1" file="lwheel1.stl"/>
+    <mesh name="lwheel2" file="lwheel2.stl"/>
+    <mesh name="rwheel1" file="rwheel1.stl"/>
+    <mesh name="rwheel2" file="rwheel2.stl"/>
+  </asset>
+</mujocoinclude>

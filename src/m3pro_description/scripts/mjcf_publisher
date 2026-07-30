@@ -10,23 +10,42 @@ from rclpy.qos import QoSProfile, DurabilityPolicy, HistoryPolicy
 from std_msgs.msg import String
 
 
-def resolve_includes(xml_string, base_dir):
-    """Recursively resolve MuJoCo <include file="..."/> directives.
+# Top-level MJCF section tags: singleton per model, so an <include> contributing
+# one of these merges into an existing same-named sibling instead of duplicating
+# it. Every other tag (body, geom, joint, site, ...) is repeatable, so matching by
+# tag name would wrongly graft a fragment's content onto an unrelated existing
+# element (e.g. two <body> children) -- those are always inserted as new siblings.
+_MERGEABLE_SECTIONS = {
+    'compiler', 'option', 'size', 'visual', 'statistic', 'default', 'custom',
+    'asset', 'worldbody', 'contact', 'equality', 'tendon', 'actuator', 'sensor',
+    'keyframe',
+}
 
-    Replicates MuJoCo's native include semantics: matching sections have their
-    children appended; new sections are inserted at the include position.
-    Relative meshdir/assetdir paths in included files are made absolute.
+
+def resolve_includes(xml_string, base_dir):
+    """Resolve MuJoCo <include file="..."/> directives at any nesting depth.
+
+    Replicates MuJoCo's native include semantics: matching top-level sections
+    have their children appended; everything else is inserted as new siblings
+    at the include's position. Relative meshdir/assetdir paths in included
+    files are made absolute.
     """
     root = ET.fromstring(xml_string)
+    _resolve_element(root, base_dir)
+    return ET.tostring(root, encoding='unicode')
 
+
+def _resolve_element(elem, base_dir):
+    """Resolve elem's own <include> children in place, then recurse into elem's
+    (now fully-expanded) children to resolve any includes nested deeper."""
     while True:
-        include = root.find('include')
+        include = elem.find('include')
         if include is None:
             break
 
         inc_file = include.get('file')
         if not inc_file:
-            root.remove(include)
+            elem.remove(include)
             continue
 
         inc_path = os.path.normpath(os.path.join(base_dir, inc_file))
@@ -35,8 +54,8 @@ def resolve_includes(xml_string, base_dir):
         with open(inc_path, 'r') as f:
             inc_content = f.read()
 
-        resolved = resolve_includes(inc_content, inc_dir)
-        inc_root = ET.fromstring(resolved)
+        inc_root = ET.fromstring(inc_content)
+        _resolve_element(inc_root, inc_dir)
 
         for compiler in inc_root.iter('compiler'):
             for attr in ('meshdir', 'assetdir'):
@@ -44,12 +63,12 @@ def resolve_includes(xml_string, base_dir):
                 if val and not os.path.isabs(val):
                     compiler.set(attr, os.path.normpath(os.path.join(inc_dir, val)))
 
-        idx = list(root).index(include)
-        root.remove(include)
+        idx = list(elem).index(include)
+        elem.remove(include)
 
         insert_offset = 0
         for child in inc_root:
-            existing = root.find(child.tag)
+            existing = elem.find(child.tag) if child.tag in _MERGEABLE_SECTIONS else None
             if existing is not None:
                 for attr_name, attr_val in child.attrib.items():
                     if attr_name not in existing.attrib:
@@ -57,10 +76,11 @@ def resolve_includes(xml_string, base_dir):
                 for sub in child:
                     existing.append(sub)
             else:
-                root.insert(idx + insert_offset, child)
+                elem.insert(idx + insert_offset, child)
                 insert_offset += 1
 
-    return ET.tostring(root, encoding='unicode')
+    for child in list(elem):
+        _resolve_element(child, base_dir)
 
 
 class MjcfPublisher(Node):

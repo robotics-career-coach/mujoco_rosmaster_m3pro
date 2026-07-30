@@ -1,0 +1,79 @@
+<mujocoinclude>
+  <!--
+    Holonomic mecanum forward-kinematics constraint, replacing wheel-ground
+    contact entirely. base_link carries three explicit planar joints instead of
+    a freejoint (base_x_joint, base_y_joint, base_yaw_joint: declared in this
+    variant's robot assembler, order matters: slide-x, slide-y, hinge-yaw, the
+    standard MuJoCo idiom for a world-plane-constrained body). This file forces
+    those three joints to always equal the exact linear combination of the four
+    wheel joints that mecanum_drive_controller's own forward kinematics computes,
+    per ros2_controllers' mecanum_drive_controller/src/odometry.cpp
+    (Odometry::update): with wheel_radius r and sum_of_robot_center_projection_
+    on_X_Y_axis S (both from controllers.yaml),
+
+      v_x   = 0.25 r (w_fl + w_rl + w_rr + w_fr)
+      v_y   = 0.25 r (-w_fl + w_rl - w_rr + w_fr)
+      w_yaw = 0.25 r/S (-w_fl - w_rl + w_rr + w_fr)
+
+    with FL=lwheel1_joint, FR=rwheel1_joint, RL=lwheel2_joint, RR=rwheel2_joint
+    per controllers.yaml's *_wheel_command_joint_name mapping. Because a fixed
+    tendon's length is a linear combination of joint *positions*, constraining
+    base_x_joint's position to the same combination of wheel positions (via an
+    tendon-vs-tendon equality) reproduces this FK relationship at the velocity
+    level too when differentiated, i.e. it's the position-domain integral of
+    the controller's own odometry integration: exact rolling-without-slip
+    kinematics, with no contact solver involved in propulsion at all.
+
+    This is a linear-algebra identity (FK/IK from the same controller source),
+    not a re-derived geometric convention like the roller/capsule handedness
+    elsewhere in this repo, EXCEPT for one wrinkle also already documented
+    for the other base variants (see verify_mecanum_wheels.py's sign-convention
+    note): lwheel*/rwheel* bodies share one local joint axis but the left/right
+    sides use mirrored body quats, so raw MuJoCo qvel sign on the right-side
+    joints (rwheel1_joint=FR, rwheel2_joint=RR) is physically inverted relative
+    to the left side for the same commanded motion. mecanum_drive_controller's
+    formula assumes a plain hardware convention where +velocity always means
+    "this wheel rolls to drive the robot forward," so this file negates the
+    right-side joints' contribution below to compensate; confirmed empirically
+    (straight/rotate/strafe all check out; see that script's -base option).
+  -->
+  <tendon>
+    <!-- 0.25*r = 0.25*0.04 = 0.01. rwheel* coefficients carry an extra -1 to
+         compensate for the mirrored-quat sign flip described above. -->
+    <fixed name="fk_x">
+      <joint joint="lwheel1_joint" coef="0.01"/>
+      <joint joint="lwheel2_joint" coef="0.01"/>
+      <joint joint="rwheel2_joint" coef="-0.01"/>
+      <joint joint="rwheel1_joint" coef="-0.01"/>
+    </fixed>
+    <fixed name="fk_y">
+      <joint joint="lwheel1_joint" coef="-0.01"/>
+      <joint joint="lwheel2_joint" coef="0.01"/>
+      <joint joint="rwheel2_joint" coef="0.01"/>
+      <joint joint="rwheel1_joint" coef="-0.01"/>
+    </fixed>
+    <!-- 0.25*r/S = 0.01/0.211 = 0.04739336 -->
+    <fixed name="fk_yaw">
+      <joint joint="lwheel1_joint" coef="-0.04739336"/>
+      <joint joint="lwheel2_joint" coef="-0.04739336"/>
+      <joint joint="rwheel2_joint" coef="-0.04739336"/>
+      <joint joint="rwheel1_joint" coef="-0.04739336"/>
+    </fixed>
+
+    <fixed name="base_x_out">
+      <joint joint="base_x_joint" coef="1"/>
+    </fixed>
+    <fixed name="base_y_out">
+      <joint joint="base_y_joint" coef="1"/>
+    </fixed>
+    <fixed name="base_yaw_out">
+      <joint joint="base_yaw_joint" coef="1"/>
+    </fixed>
+  </tendon>
+
+  <equality>
+    <tendon tendon1="base_x_out" tendon2="fk_x" polycoef="0 1 0 0 0"/>
+    <tendon tendon1="base_y_out" tendon2="fk_y" polycoef="0 1 0 0 0"/>
+    <tendon tendon1="base_yaw_out" tendon2="fk_yaw" polycoef="0 1 0 0 0"/>
+  </equality>
+</mujocoinclude>

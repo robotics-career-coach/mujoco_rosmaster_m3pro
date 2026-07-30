@@ -1,0 +1,77 @@
+<mujocoinclude>
+  <!--
+    Wheel layout (top-down, +X is front):
+      lwheel1 (FL)  ___  rwheel1 (FR)
+                   |   |
+      lwheel2 (RL)  ===  rwheel2 (RR)
+
+    Approach 2 from docs/mecanum_drive_modeling_in_mujoco.md: each wheel's collision
+    geom is a single capsule (not cylinder: MuJoCo's contact tangent frame only
+    reliably rotates with a capsule's own longitudinal axis, see
+    google-deepmind/mujoco#67) tilted 45 degrees from the spin axis to stand in for
+    the real roller's free-slip direction. The tilt quat isn't a simple "45 deg
+    about one axis" guess: it's derived from bases/mecanum/wheels.xml's roller0
+    joint axis for the same corner (already validated empirically for handedness/
+    chirality via scripts/verify_mecanum_wheels.py), with its azimuthal direction
+    preserved but its polar angle from the spin axis pushed to the textbook-ideal
+    45 degrees (the roller model itself uses ~18.5 degrees at N=12 rollers: a
+    trade-off that doesn't apply here since a single capsule has no roller-count
+    coupling). lwheel1/rwheel2 share one tilt, rwheel1/lwheel2 the mirrored one.
+    Actual anisotropic friction values live in contacts.xml as <pair> overrides
+    against the ground geom, since geom-level friction can't express two
+    different tangential coefficients (needs condim>=4 + cone="elliptic", set in
+    the scene's <option>).
+
+    No rollers, no extra bodies/joints: one hinge joint and one geom per wheel,
+    same as a plain wheeled robot. Cheaper and more stable than the roller model,
+    at the cost of not capturing roller-scale contact effects (the small periodic
+    bumps from the wheel not being perfectly round): and, currently, at the
+    cost of real strafe/rotate cross-coupling that isn't fully resolved yet; see
+    the KNOWN LIMITATION note in contacts.xml before relying on this variant for
+    anything strafe-accuracy-sensitive.
+  -->
+
+  <!-- Front-left wheel (handedness +1) -->
+  <body name="lwheel1" pos="0.0775754 0.09775 0.04" quat="0.707107 0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="lwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="lwheel1_visual" type="mesh" mesh="lwheel1" class="visual"
+          material="black_rubber"/>
+    <geom name="lwheel1_collision" type="capsule" size="0.032 0.008"
+          pos="0 0 0.0109" quat="0.9238795 0.0990462 0.3696437 0" class="wheel_contact"/>
+  </body>
+
+  <!-- Front-right wheel (handedness -1) -->
+  <body name="rwheel1" pos="0.0775754 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="rwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="rwheel1_visual" type="mesh" mesh="rwheel1" class="visual"
+          material="black_rubber"/>
+    <geom name="rwheel1_collision" type="capsule" size="0.032 0.008"
+          pos="0 0 0.0109" quat="0.9238795 0.0990462 -0.3696437 0" class="wheel_contact"/>
+  </body>
+
+  <!-- Rear-left wheel (handedness -1) -->
+  <body name="lwheel2" pos="-0.0814246 0.09775 0.04" quat="0.707107 0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="lwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="lwheel2_visual" type="mesh" mesh="lwheel2" class="visual"
+          material="black_rubber"/>
+    <geom name="lwheel2_collision" type="capsule" size="0.032 0.008"
+          pos="0 0 0.0109" quat="0.9238795 0.0990462 -0.3696437 0" class="wheel_contact"/>
+  </body>
+
+  <!-- Rear-right wheel (handedness +1) -->
+  <body name="rwheel2" pos="-0.0814246 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
+    <inertial pos="0 0 0.0109" mass="0.0973"
+              diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
+    <joint name="rwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+    <geom name="rwheel2_visual" type="mesh" mesh="rwheel2" class="visual"
+          material="black_rubber"/>
+    <geom name="rwheel2_collision" type="capsule" size="0.032 0.008"
+          pos="0 0 0.0109" quat="0.9238795 0.0990462 0.3696437 0" class="wheel_contact"/>
+  </body>
+</mujocoinclude>

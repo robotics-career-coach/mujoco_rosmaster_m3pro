@@ -1,0 +1,131 @@
+<mujocoinclude>
+  <!-- Depth camera, 6-DOF arm, gripper, and LiDAR sites: identical across
+       every base variant. Included directly inside <body name="base_link">,
+       alongside the variant-specific wheel bodies. -->
+
+  <!-- Depth Camera -->
+  <body name="camera_link" pos="0.0909155 0.000198 0.0935" quat="0.707107 0.707107 0 0">
+    <inertial pos="-0.00516 0.01716 0" mass="0.054"
+              diaginertia="3.1e-05 3.0e-05 5.8e-06"/>
+    <geom name="camera_visual" type="mesh" mesh="Camera" class="visual"
+          material="camera_body"/>
+    <camera name="depth_camera_rgb" pos="0 0.025 0" quat="0.5 0.5 -0.5 0.5"
+            fovy="58" resolution="640 480"/>
+    <camera name="depth_camera_depth" pos="0 0.025 0" quat="0.5 0.5 -0.5 0.5"
+            fovy="58" resolution="640 480"/>
+  </body>
+
+  <!-- 6-DOF Arm -->
+  <body name="arm1" pos="0.033617 -1.2421e-05 0.185" quat="0.999899 3.18723e-05 4.52537e-07 0.014197">
+    <inertial pos="2.14e-05 -2.29e-05 0.0109" quat="0.507 0.493 -0.507 0.493"
+              mass="0.0244" diaginertia="6.04e-06 4.13e-06 3.52e-06"/>
+    <joint name="arm1_joint" axis="0 0 1" range="-1.5708 1.5708" damping="1.0" armature="0.01"/>
+    <geom name="arm1_visual" type="mesh" mesh="arm1" class="visual"
+          material="blue_servo"/>
+    <geom name="arm1_collision" type="cylinder" class="collision"
+          pos="0 0 0.015" size="0.02 0.015"/>
+
+    <body name="arm2" pos="-0.0021522 6.1185e-05 0.033" quat="0.999899 -3.18593e-05 4.52783e-07 -0.0142105">
+      <inertial pos="-0.0006 -9.3e-05 0.0264" quat="1 0.00269 0 0"
+                mass="0.0615" diaginertia="2.11e-05 1.64e-05 9.72e-06"/>
+      <joint name="arm2_joint" axis="0 -1 -6.3725e-05" range="-1.5708 1.5708" damping="1.0" armature="0.01"/>
+      <geom name="arm2_visual" type="mesh" mesh="arm2" class="visual"
+            material="silver_bracket"/>
+      <geom name="arm2_collision" type="capsule" class="collision"
+            pos="0 0 0.04" size="0.015 0.04"/>
+
+      <body name="arm3" pos="0 0 0.08285" quat="0.999908 3.18481e-05 4.316e-07 0.0135506">
+        <inertial pos="-0.0006 -7.5e-05 0.0258" quat="1 0.00266 0 -0.01355"
+                  mass="0.0615" diaginertia="2.11e-05 1.64e-05 9.72e-06"/>
+        <joint name="arm3_joint" axis="-0.027 -0.9996 0" range="-1.5708 1.5708" damping="1.0" armature="0.01"/>
+        <geom name="arm3_visual" type="mesh" mesh="arm3" class="visual"
+              material="silver_bracket"/>
+        <geom name="arm3_collision" type="capsule" class="collision"
+              pos="0 0 0.04" size="0.015 0.04"/>
+
+        <body name="arm4" pos="0 0 0.08285" quat="0.999908 0 0 -0.0135371">
+          <inertial pos="0.00266 -5.5e-05 0.0318" mass="0.0797"
+                    diaginertia="1.97e-05 1.75e-05 1.24e-05"/>
+          <joint name="arm4_joint" axis="-2.64e-05 -1 0" range="-1.5708 1.5708" damping="0.5" armature="0.01"/>
+          <geom name="arm4_visual" type="mesh" mesh="arm4" class="visual"
+                material="blue_servo"/>
+          <geom name="dcw2_visual" type="mesh" mesh="DCW2" class="visual"
+                pos="-0.0484 0.00245 0.0672" quat="0.707 0.01 -0.707 0.01"
+                material="dark_plastic"/>
+
+          <body name="arm5" pos="0.00057305 0 0.074815">
+            <inertial pos="0.0186 -0.00247 0.0265" mass="0.0410"
+                      diaginertia="5.48e-06 5.25e-06 1.91e-06"/>
+            <joint name="arm5_joint" axis="0 0 1" range="-1.5708 1.5708" damping="0.5" armature="0.01"/>
+            <geom name="arm5_visual" type="mesh" mesh="arm5" class="visual"
+                  material="blue_servo"/>
+            <geom name="gripping_visual" type="mesh" mesh="Gripping" class="visual"
+                  pos="-0.000625 0.00024 0.093235"
+                  quat="0.707105 -1.02e-05 -0.707108 -1.03e-05"
+                  material="silver_bracket"/>
+
+            <!-- Gripper right finger -->
+            <body name="rlink1" pos="-0.0047503 -0.012625 0.029275" quat="0.6261 0.328628 -0.626103 -0.328628">
+              <inertial pos="0.00809 0.000355 -0.000465" mass="0.00470"
+                        diaginertia="5.46e-07 4.54e-07 1.01e-07"/>
+              <joint name="rlink1_joint" axis="0 0 -1" range="-0.95 0" damping="0.1" armature="0.005"/>
+              <geom name="rlink1_visual" type="mesh" mesh="rlink1" class="visual"
+                    material="silver_bracket"/>
+              <body name="rlink2" pos="0.03 0 0.001" quat="0.885443 0 0 0.464748">
+                <inertial pos="0.02257 0.00616 -0.005" mass="0.00614"
+                          diaginertia="1.58e-06 1.54e-06 4.67e-08"/>
+                <joint name="rlink2_joint" axis="0 0 1"/>
+                <geom name="rlink2_visual" type="mesh" mesh="rlink2" class="visual"
+                      material="silver_bracket"/>
+              </body>
+            </body>
+
+            <!-- Gripper left finger -->
+            <body name="llink1" pos="-0.0044997 0.012375 0.029275" quat="0.625951 -0.328913 -0.625953 0.328913">
+              <inertial pos="0.00885 -0.000342 -0.000169" mass="0.00427"
+                        diaginertia="5.37e-07 4.56e-07 8.80e-08"/>
+              <joint name="llink1_joint" axis="0 0 1"/>
+              <geom name="llink1_visual" type="mesh" mesh="llink1" class="visual"
+                    material="silver_bracket"/>
+              <body name="llink2" pos="0.03 0 0.00125" quat="0.885229 0 0 -0.465155">
+                <inertial pos="0.02263 -0.00593 -0.00525" mass="0.00614"
+                          diaginertia="1.58e-06 1.54e-06 4.67e-08"/>
+                <joint name="llink2_joint" axis="0 0 1"/>
+                <geom name="llink2_visual" type="mesh" mesh="llink2" class="visual"
+                      material="silver_bracket"/>
+              </body>
+            </body>
+
+            <!-- Gripper right tip -->
+            <body name="rlink3" pos="-0.0045001 -0.0044999 0.047275" quat="0.627495 0.325958 -0.627497 -0.325958">
+              <inertial pos="0.01479 0 -0.00271" mass="0.00271"
+                        diaginertia="1.64e-07 1.63e-07 9.18e-09"/>
+              <joint name="rlink3_joint" axis="0 0 1"/>
+              <geom name="rlink3_visual" type="mesh" mesh="rlink3" class="visual"
+                    material="silver_bracket"/>
+              <geom name="right_finger_pad" type="box" class="collision"
+                    pos="0.025 0 -0.003" size="0.018 0.006 0.006"
+                    rgba="0.05 0.05 0.05 0.35" friction="2.0 0.5 0.5" mass="0.001"/>
+            </body>
+
+            <!-- Gripper left tip -->
+            <body name="llink3" pos="-0.0044999 0.0045001 0.047275" quat="0.62791 -0.325158 -0.627912 0.325158">
+              <inertial pos="0.01479 0 -0.00271" mass="0.00271"
+                        diaginertia="1.64e-07 1.63e-07 9.18e-09"/>
+              <joint name="llink3_joint" axis="0 0 1"/>
+              <geom name="llink3_visual" type="mesh" mesh="llink3" class="visual"
+                    material="silver_bracket"/>
+              <geom name="left_finger_pad" type="box" class="collision"
+                    pos="0.025 0 -0.003" size="0.018 0.006 0.006"
+                    rgba="0.05 0.05 0.05 0.35" friction="2.0 0.5 0.5" mass="0.001"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </body>
+
+  <!-- LiDAR Sites -->
+  <site name="lidar_front_site" pos="0.10 0.06 0.10" size="0.01" rgba="0 1 0 0.5"/>
+  <site name="lidar_rear_site" pos="-0.10 -0.06 0.10" size="0.01" rgba="0 1 0 0.5"/>
+</mujocoinclude>

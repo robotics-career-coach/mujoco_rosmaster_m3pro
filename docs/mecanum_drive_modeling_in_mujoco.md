@@ -12,6 +12,7 @@ particular project's implementation.
   2. [Anisotropic friction on a simplified shape](#2-anisotropic-friction-on-a-simplified-shape-smart--compromise-route)
   3. [Rigid roller shapes with anisotropic friction](#3-rigid-roller-shapes-with-anisotropic-friction-hybrid-route)
   4. [Plain wheel + isotropic friction](#4-plain-wheel--isotropic-friction-not-recommended)
+  5. [Holonomic kinematic constraint (no contact)](#5-holonomic-kinematic-constraint-no-contact-ghost-base-route)
 - [Comparison summary](#comparison-summary)
 - [Practical checklist (approach 2)](#practical-checklist-approach-2)
 - [References](#references)
@@ -159,6 +160,59 @@ kinematics at all. Only useful for the coarsest smoke tests (e.g. "does
 anything move when I send a velocity command") — never for actually
 validating holonomic behavior.
 
+### 5. Holonomic kinematic constraint (no contact, "ghost base" route)
+
+Skip wheel-ground contact entirely. Give the chassis body explicit planar
+joints (slide-x, slide-y, hinge-yaw, in that order — the standard MuJoCo
+idiom for a body constrained to move in a plane) instead of a `freejoint`,
+and hold those three joints to the wheel joints' exact forward-kinematics
+combination via `<tendon><fixed>` elements plus `<equality><tendon>`
+constraints. Concretely: build one fixed tendon per output DOF, each a linear
+combination of the wheel joint positions using the same coefficients your
+motion controller's forward-kinematics/odometry code uses, plus one
+single-joint pass-through tendon per chassis DOF, then equality-constrain
+each pass-through tendon to its corresponding wheel-combination tendon.
+Because a fixed tendon's length is a linear combination of joint
+*positions*, this reproduces the velocity-level forward-kinematics
+relationship when differentiated too — it's the position-domain integral of
+the same odometry math, enforced continuously by the constraint solver
+rather than computed once in software.
+
+**Advantages**
+- No contact solver involved in propulsion at all, so none of the
+  jitter/instability sources the other four approaches have to manage
+  (faceted-wheel bobbing, contact-frame orientation quirks, solver stiffness)
+  can appear. Wheel geoms can be made non-colliding entirely.
+- Exact rolling-without-slip kinematics by construction — no friction
+  coefficients to tune, no handedness/orientation convention to get subtly
+  wrong, since it's a direct transcription of already-correct forward-
+  kinematics code rather than a re-derived geometric approximation.
+- The wheel joints/actuators themselves are untouched, so a motion
+  controller that commands per-wheel velocities (and reads per-wheel
+  odometry) keeps working unchanged against this base — only the physics
+  underneath the same four named joints changes.
+
+**Disadvantages**
+- No traction/slip modeling whatsoever — the base can never actually lose
+  traction, get stuck, or behave differently on a low-friction surface,
+  since ground contact isn't part of the propulsion path.
+- One easy-to-miss gotcha: if the real (or simulated) wheel joints' positive-
+  velocity sign doesn't uniformly mean "drive forward" across every wheel
+  (e.g. mirrored-body wheel definitions where left/right sides need opposite
+  raw joint-velocity signs for the same physical motion — common when wheel
+  bodies are built via mirrored quats rather than mirrored meshes), the
+  tendon coefficients need a compensating sign flip on the affected wheels.
+  This is a one-time, verifiable correction (check straight/strafe/rotate
+  motion primitives all produce clean, uncoupled motion), not a source of
+  ongoing uncertainty once confirmed.
+- Doesn't exercise the wheel-ground contact model at all, so it's a poor
+  choice whenever contact behavior is specifically what's being validated.
+
+**When to use it**: when base wheel-ground physics isn't what's under test
+(e.g. arm manipulation work, navigation-stack logic, sensor pipeline
+development) and the smoothest, most deterministic base motion is more
+valuable than physical realism.
+
 ## Comparison summary
 
 | # | Approach | Fidelity | Cost | Best for |
@@ -167,6 +221,7 @@ validating holonomic behavior.
 | 2 | Anisotropic friction, capsule | Good (flat ground) | Low | Default choice for ROS2 dev/test on typical floors |
 | 3 | Rigid roller shapes + anisotropic friction | Better than single-capsule, less than full rollers | Medium | When approach 2 isn't accurate enough but approach 1 is too expensive |
 | 4 | Plain wheel, isotropic friction | Wrong | Lowest | Never, except a rough "does it move" smoke test |
+| 5 | Holonomic kinematic constraint, no contact | N/A (no traction modeling at all) | Lowest | Base physics isn't under test; want maximal smoothness/determinism |
 
 ## Practical checklist (approach 2)
 

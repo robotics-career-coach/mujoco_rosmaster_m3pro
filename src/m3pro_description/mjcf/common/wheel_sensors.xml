@@ -1,0 +1,14 @@
+<mujocoinclude>
+  <!-- Identical across every base variant: these read the same four named
+       joints regardless of how the wheel-ground interaction is modeled. -->
+  <sensor>
+    <jointpos name="fl_wheel_pos" joint="lwheel1_joint"/>
+    <jointpos name="fr_wheel_pos" joint="rwheel1_joint"/>
+    <jointpos name="rl_wheel_pos" joint="lwheel2_joint"/>
+    <jointpos name="rr_wheel_pos" joint="rwheel2_joint"/>
+    <jointvel name="fl_wheel_vel" joint="lwheel1_joint"/>
+    <jointvel name="fr_wheel_vel" joint="rwheel1_joint"/>
+    <jointvel name="rl_wheel_vel" joint="lwheel2_joint"/>
+    <jointvel name="rr_wheel_vel" joint="rwheel2_joint"/>
+  </sensor>
+</mujocoinclude>

@@ -13,7 +13,17 @@ def generate_launch_description():
 
     scene_arg = DeclareLaunchArgument(
         'scene', default_value='empty',
-        description='Scene to load (maps to mjcf/scene_<value>.xml)',
+        description='Scene to load (maps to mjcf/scene_<scene>_<base>.xml)',
+    )
+
+    base_arg = DeclareLaunchArgument(
+        'base', default_value='mecanum',
+        description=(
+            'Base wheel model to simulate (maps to mjcf/scene_<scene>_<base>.xml): '
+            'mecanum (passive-roller wheels, highest fidelity, default), '
+            'friction (anisotropic-friction capsule wheels, cheaper/smoother), '
+            'kinematic (no wheel-ground contact at all -- holonomic ghost base)'
+        ),
     )
 
     robot_description_file = os.path.join(
@@ -32,7 +42,10 @@ def generate_launch_description():
         executable='mjcf_publisher',
         name='mjcf_description_publisher',
         parameters=[{
-            'mjcf_path': [mjcf_dir, 'scene_', LaunchConfiguration('scene'), '.xml'],
+            'mjcf_path': [
+                mjcf_dir, 'scene_', LaunchConfiguration('scene'),
+                '_', LaunchConfiguration('base'), '.xml',
+            ],
         }],
         output='screen',
     )
@@ -133,6 +146,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         scene_arg,
+        base_arg,
         mjcf_publisher_node,
         delay_ros2_control,
         shutdown_on_sim_exit,

@@ -1,0 +1,14 @@
+<mujocoinclude>
+  <sensor>
+    <framequat name="imu_quat" objtype="site" objname="imu_site"/>
+    <gyro name="imu_gyro" site="imu_site"/>
+    <accelerometer name="imu_accel" site="imu_site"/>
+
+    <jointpos name="arm1_pos" joint="arm1_joint"/>
+    <jointpos name="arm2_pos" joint="arm2_joint"/>
+    <jointpos name="arm3_pos" joint="arm3_joint"/>
+    <jointpos name="arm4_pos" joint="arm4_joint"/>
+    <jointpos name="arm5_pos" joint="arm5_joint"/>
+    <jointpos name="gripper_pos" joint="rlink1_joint"/>
+  </sensor>
+</mujocoinclude>

@@ -1,25 +1,37 @@
 #!/usr/bin/env python3
 """
-Headless MuJoCo verification for the passive-roller mecanum wheels.
+Headless MuJoCo verification for the mecanum base variants.
 
-Loads scene_empty.xml (which <include>s m3pro_robot.xml -- the file the real
-simulation actually loads), settles it under gravity, then drives it through
-straight, rotate-in-place, and strafe motion primitives, reporting
-displacement, tilt, and ground-contact stability for each. Strafe is the
-pass/fail check for roller handedness (see generate_mecanum_rollers.py's
-WHEELS table) -- if the robot spins or moves diagonally instead of sideways,
-flip the handedness signs there and regenerate.
+Loads scene_empty_<base>.xml (which <include>s m3pro_robot_<base>.xml -- the
+file the real simulation actually loads for that base), settles it under
+gravity, then drives it through straight, rotate-in-place, and strafe motion
+primitives, reporting displacement, tilt, and ground-contact stability for
+each. Strafe is the pass/fail check for correct mecanum kinematics -- if the
+robot spins or moves diagonally instead of sideways:
+  - mecanum base: flip the handedness signs in generate_mecanum_rollers.py's
+    WHEELS table and regenerate.
+  - friction base: swap the two tangential friction values (t1/t2) in
+    bases/friction/contacts.xml, or flip the capsule euler tilt signs in
+    bases/friction/wheels.xml -- see that file's header comment.
+  - kinematic base: the FK/IK tendon coefficients in
+    bases/kinematic/planar_drive.xml are a transcription of
+    mecanum_drive_controller's own source, not an independently derived
+    convention, so a strafe/rotate failure here most likely means a
+    transcription error worth double-checking against that source, not a
+    sign flip to try empirically.
 
-Run: python3 src/m3pro_description/scripts/verify_mecanum_wheels.py
+Run: python3 src/m3pro_description/scripts/verify_mecanum_wheels.py [--base mecanum|friction|kinematic|all]
 """
 
+import argparse
 import math
 from pathlib import Path
 
 import mujoco
 import numpy as np
 
-MJCF_PATH = Path(__file__).parent.parent / "mjcf" / "scene_empty.xml"
+MJCF_DIR = Path(__file__).parent.parent / "mjcf"
+BASES = ["mecanum", "friction", "kinematic"]
 
 WHEEL_ACTUATORS = ["fl_wheel_motor", "fr_wheel_motor", "rl_wheel_motor", "rr_wheel_motor"]
 
@@ -84,8 +96,10 @@ def run_scenario(model, name, wheel_speeds, steps=1500):
     return disp, yaw_change_deg, max_tilt, height_std, angvel_std, angvel_max
 
 
-def main():
-    model = mujoco.MjModel.from_xml_path(str(MJCF_PATH))
+def verify_base(base):
+    mjcf_path = MJCF_DIR / f"scene_empty_{base}.xml"
+    print(f"\n{'#' * 60}\n# base variant: {base}  ({mjcf_path.name})\n{'#' * 60}")
+    model = mujoco.MjModel.from_xml_path(str(mjcf_path))
 
     v = 6.0
     # order: fl, fr, rl, rr
@@ -96,6 +110,8 @@ def main():
     # between left/right sides" is the STRAIGHT pattern -- confirmed empirically
     # against this model (this was true even before the roller migration; it's
     # a property of how these wheel joints/quats are defined, not a roller bug).
+    # This sign convention is a property of the shared wheel body/joint
+    # definitions, so it holds across all base variants, not just mecanum.
     run_scenario(model, "straight (left+, right-)", [v, -v, v, -v])
     run_scenario(model, "rotate in place (all wheels equal)", [v, v, v, v])
     run_scenario(
@@ -108,6 +124,18 @@ def main():
         "strafe, opposite pattern (front+, rear-)",
         [v, v, -v, -v],
     )
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--base", choices=BASES + ["all"], default="all",
+        help="Which base variant's scene_empty_<base>.xml to verify (default: all)",
+    )
+    args = parser.parse_args()
+
+    for base in BASES if args.base == "all" else [args.base]:
+        verify_base(base)
 
 
 if __name__ == "__main__":

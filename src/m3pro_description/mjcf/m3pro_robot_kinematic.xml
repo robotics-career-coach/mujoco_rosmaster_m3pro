@@ -1,0 +1,44 @@
+<mujoco>
+  <compiler angle="radian" meshdir="../meshes"/>
+
+  <default>
+    <geom contype="1" conaffinity="1"/>
+    <joint damping="0.5" armature="0.01"/>
+
+    <default class="visual">
+      <geom contype="0" conaffinity="0" group="1"/>
+    </default>
+
+    <default class="collision">
+      <geom group="3" rgba="0.5 0.5 0.5 0.3"/>
+    </default>
+  </default>
+
+  <include file="common/assets.xml"/>
+
+  <worldbody>
+    <body name="base_link" pos="0 0 0.042">
+      <!-- Planar joint stack (order matters): world-frame x/y translation,
+           then yaw about the body's own z. No z/roll/pitch DOF at all: the
+           base is rigidly held to the plane, driven entirely by the
+           tendon-equality constraints in bases/kinematic/planar_drive.xml,
+           not by gravity/contact like the other variants' freejoint. -->
+      <joint name="base_x_joint" type="slide" axis="1 0 0" damping="0" armature="0"/>
+      <joint name="base_y_joint" type="slide" axis="0 1 0" damping="0" armature="0"/>
+      <joint name="base_yaw_joint" type="hinge" axis="0 0 1" damping="0" armature="0"/>
+      <include file="common/body_core.xml"/>
+      <include file="bases/kinematic/wheels.xml"/>
+      <include file="common/arm_camera_gripper.xml"/>
+    </body>
+  </worldbody>
+
+  <include file="bases/kinematic/planar_drive.xml"/>
+
+  <include file="common/gripper_equality.xml"/>
+
+  <include file="common/wheel_actuators.xml"/>
+  <include file="common/arm_actuators.xml"/>
+
+  <include file="common/imu_arm_sensors.xml"/>
+  <include file="common/wheel_sensors.xml"/>
+</mujoco>

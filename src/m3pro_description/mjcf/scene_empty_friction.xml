@@ -1,0 +1,19 @@
+<mujoco model="m3pro">
+  <include file="m3pro_robot_friction.xml"/>
+
+  <!-- cone="elliptic" is required for the friction base's anisotropic wheel-ground
+       <pair> overrides (see bases/friction/contacts.xml) to behave as two distinct
+       tangential friction coefficients instead of being averaged/approximated. -->
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast" cone="elliptic"/>
+
+  <visual>
+    <global azimuth="135" elevation="-25"/>
+    <quality shadowsize="2048"/>
+  </visual>
+
+  <include file="environments/ground_asset.xml"/>
+
+  <worldbody>
+    <include file="environments/empty_world.xml"/>
+  </worldbody>
+</mujoco>

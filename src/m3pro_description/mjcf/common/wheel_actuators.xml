@@ -1,0 +1,33 @@
+<mujocoinclude>
+  <!-- Written as <general> rather than the <velocity> shortcut so dyntype/dynprm can be
+       set: gaintype/biastype below reproduce kv=5 exactly (this is what <velocity kv="5">
+       expands to internally), and dyntype="filterexact" ramps the activation state toward
+       ctrl with time constant dynprm[0] instead of tracking it instantaneously, modeling
+       the real hardware's motor/ESC acceleration limit. No real M3 Pro accel spec is
+       available yet; 0.15s (~63% of setpoint in 150ms) is a placeholder; tune against
+       hardware when known. filterexact (vs "filter") integrates the ramp analytically so
+       it stays accurate regardless of dynprm[0] vs the 0.002s timestep.
+
+       Identical across every base variant: these drive the same four named joints
+       (lwheel1_joint, rwheel1_joint, lwheel2_joint, rwheel2_joint) that
+       mecanum_drive_controller commands regardless of how the wheel-ground interaction
+       is modeled underneath. -->
+  <actuator>
+    <general name="fl_wheel_motor" joint="lwheel1_joint" ctrlrange="-20 20"
+             dyntype="filterexact" dynprm="0.15 0 0"
+             gaintype="fixed" gainprm="5 0 0"
+             biastype="affine" biasprm="0 0 -5"/>
+    <general name="fr_wheel_motor" joint="rwheel1_joint" ctrlrange="-20 20"
+             dyntype="filterexact" dynprm="0.15 0 0"
+             gaintype="fixed" gainprm="5 0 0"
+             biastype="affine" biasprm="0 0 -5"/>
+    <general name="rl_wheel_motor" joint="lwheel2_joint" ctrlrange="-20 20"
+             dyntype="filterexact" dynprm="0.15 0 0"
+             gaintype="fixed" gainprm="5 0 0"
+             biastype="affine" biasprm="0 0 -5"/>
+    <general name="rr_wheel_motor" joint="rwheel2_joint" ctrlrange="-20 20"
+             dyntype="filterexact" dynprm="0.15 0 0"
+             gaintype="fixed" gainprm="5 0 0"
+             biastype="affine" biasprm="0 0 -5"/>
+  </actuator>
+</mujocoinclude>

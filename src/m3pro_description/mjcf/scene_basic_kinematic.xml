@@ -1,0 +1,17 @@
+<mujoco model="m3pro_basic">
+  <include file="m3pro_robot_kinematic.xml"/>
+
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast"/>
+
+  <visual>
+    <global azimuth="135" elevation="-25"/>
+    <quality shadowsize="2048"/>
+  </visual>
+
+  <include file="environments/ground_asset.xml"/>
+  <include file="environments/basic_extra_assets.xml"/>
+
+  <worldbody>
+    <include file="environments/basic_world.xml"/>
+  </worldbody>
+</mujoco>

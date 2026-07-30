@@ -1,0 +1,37 @@
+<mujocoinclude>
+  <!-- Anisotropic friction against the ground plane, standing in for each wheel's
+       real rollers. Geom-level friction can't express two different tangential
+       coefficients, so this needs explicit <pair> overrides (condim=4, and the
+       scene's <option> must set cone="elliptic": see
+       docs/mecanum_drive_modeling_in_mujoco.md, approach 2's practical checklist).
+
+       friction="t1 t2 torsional roll1 roll2": t1 is the tangential direction that
+       (per MuJoCo's capsule contact-frame handling) rotates with each wheel
+       geom's own tilted long axis: i.e. the simulated roller's free-slip axis,
+       so it's set low. t2 is the direction perpendicular to it in the contact
+       plane: the grip/rolling direction: set high.
+
+       KNOWN LIMITATION, confirmed via verify_mecanum_wheels.py's friction-base check:
+       straight-line driving is clean, but strafe and rotate-in-place still show
+       real cross-coupling (strafe induces ~10-30 deg of unwanted yaw per run;
+       rotate-in-place has weak yaw authority and some lateral drift), even
+       after re-deriving the capsule tilt in wheels.xml from the already-validated
+       roller axis direction (bases/mecanum) instead of a naive 45 deg guess;
+       that change measurably reduced but did not eliminate the coupling. Plain
+       forward/backward motion is trustworthy; don't rely on this base variant
+       for strafe-accuracy-sensitive testing without further tuning. Candidates
+       for the next iteration: condim="6", per-wheel <pair> friction values
+       tuned individually rather than shared, or replacing the single capsule
+       with a small cluster of rigid roller-shaped geoms (approach 3 in
+       docs/mecanum_drive_modeling_in_mujoco.md) instead of one tilted capsule.
+
+       Assumes the scene's ground geom is named "ground" (true of every
+       scene_*.xml in this package); wheel contact against other objects (e.g.
+       scene_basic's table/walls) falls back to plain isotropic geom friction. -->
+  <contact>
+    <pair geom1="lwheel1_collision" geom2="ground" condim="4" friction="0.03 1.2 0.005 0.0001 0.0001"/>
+    <pair geom1="rwheel1_collision" geom2="ground" condim="4" friction="0.03 1.2 0.005 0.0001 0.0001"/>
+    <pair geom1="lwheel2_collision" geom2="ground" condim="4" friction="0.03 1.2 0.005 0.0001 0.0001"/>
+    <pair geom1="rwheel2_collision" geom2="ground" condim="4" friction="0.03 1.2 0.005 0.0001 0.0001"/>
+  </contact>
+</mujocoinclude>

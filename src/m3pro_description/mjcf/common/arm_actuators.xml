@@ -1,0 +1,11 @@
+<mujocoinclude>
+  <actuator>
+    <position name="arm1_motor" joint="arm1_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm2_motor" joint="arm2_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm3_motor" joint="arm3_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm4_motor" joint="arm4_joint" kp="20" ctrlrange="-1.5708 1.5708"/>
+    <position name="arm5_motor" joint="arm5_joint" kp="20" ctrlrange="-1.5708 1.5708"/>
+
+    <position name="gripper_motor" joint="rlink1_joint" kp="25" ctrlrange="-0.95 0"/>
+  </actuator>
+</mujocoinclude>

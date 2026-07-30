@@ -1,0 +1,9 @@
+<mujocoinclude>
+  <equality>
+    <joint joint1="llink1_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
+    <joint joint1="rlink2_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
+    <joint joint1="llink2_joint" joint2="rlink1_joint" polycoef="0 -1 0 0 0"/>
+    <joint joint1="rlink3_joint" joint2="rlink1_joint" polycoef="0 -1 0 0 0"/>
+    <joint joint1="llink3_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
+  </equality>
+</mujocoinclude>

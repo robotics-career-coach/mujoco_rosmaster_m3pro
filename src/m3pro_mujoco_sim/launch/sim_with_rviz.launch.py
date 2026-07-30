@@ -13,14 +13,25 @@ def generate_launch_description():
 
     scene_arg = DeclareLaunchArgument(
         'scene', default_value='empty',
-        description='Scene to load (maps to mjcf/scene_<value>.xml)',
+        description='Scene to load (maps to mjcf/scene_<scene>_<base>.xml)',
+    )
+
+    base_arg = DeclareLaunchArgument(
+        'base', default_value='mecanum',
+        description=(
+            'Base wheel model to simulate (maps to mjcf/scene_<scene>_<base>.xml): '
+            'mecanum, friction, or kinematic -- see sim.launch.py'
+        ),
     )
 
     sim_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(sim_pkg, 'launch', 'sim.launch.py')
         ),
-        launch_arguments={'scene': LaunchConfiguration('scene')}.items(),
+        launch_arguments={
+            'scene': LaunchConfiguration('scene'),
+            'base': LaunchConfiguration('base'),
+        }.items(),
     )
 
     rviz_config = os.path.join(description_pkg, 'rviz', 'm3pro.rviz')
@@ -36,6 +47,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         scene_arg,
+        base_arg,
         sim_launch,
         rviz_node,
     ])

@@ -1,0 +1,24 @@
+# PID gains for the wheel joints' MuJoCo <motor> (effort) actuators, driven via
+# a velocity command_interface. Consumed by mujoco_ros2_control's MujocoSystemInterface
+# (see pids_config_file in m3pro_ros2_control.urdf.xacro).
+#
+# NOTE: the installed ros-humble-mujoco-ros2-control build has a bug where the
+# velocity-PID readiness check reads the *position* PID's gains instead of the
+# velocity PID's (mujoco_system_interface.cpp, initialize_velocity_pids() calls
+# actuator_data.pos_pid->getGains() instead of vel_pid->getGains()). The actual
+# runtime effort computation correctly uses vel_pid, so the fix is just to also
+# define a (functionally unused) finite position PID per joint to satisfy the
+# buggy check -- these joints only ever use the velocity command_interface.
+/**:
+  ros__parameters:
+    pid_gains:
+      position:
+        lwheel1_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+        rwheel1_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+        lwheel2_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+        rwheel2_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+      velocity:
+        lwheel1_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+        rwheel1_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+        lwheel2_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}
+        rwheel2_joint: {p: 0.05, i: 0.01, d: 0.0, u_clamp_max: 0.5, u_clamp_min: -0.5, i_clamp_max: 0.5, i_clamp_min: -0.5}

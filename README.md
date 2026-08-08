@@ -6,7 +6,7 @@ MuJoCo physics simulation of the [Yahboom ROSMASTER M3 Pro](https://category.yah
 
 ## Robot Features Simulated
 
-- **Mecanum drive base** — 4 mecanum wheels with anisotropic friction, omnidirectional motion
+- **Mecanum drive base** — 4 mecanum wheels modeled with real roller geometry (hub + free-spinning rollers, see `MECANUM_MODELING_NOTES.md`), omnidirectional motion
 - **6-DOF robotic arm** — Position-controlled with gripper (mimic-joint coupled fingers)
 - **Depth camera** — RGB + depth image streams
 - **Dual LiDAR** — Front-left and rear-right TOF rangefinder arrays (T-mini Plus, 0.05–12m range)
@@ -51,7 +51,7 @@ src/
 | Topic | Type | Description |
 |-------|------|-------------|
 | `/joint_states` | `sensor_msgs/JointState` | All joint positions and velocities |
-| `/mecanum_drive_controller/odom` | `nav_msgs/Odometry` | Wheel odometry |
+| `/mecanum_drive_controller/odometry` | `nav_msgs/Odometry` | Wheel odometry |
 | `/imu/data` | `sensor_msgs/Imu` | IMU data (via MuJoCo sensor plugin) |
 | `/depth_camera/color/image_raw` | `sensor_msgs/Image` | RGB camera image |
 | `/depth_camera/depth/image_raw` | `sensor_msgs/Image` | Depth image |
@@ -121,7 +121,8 @@ sudo apt install -y \
   ros-humble-robot-state-publisher \
   ros-humble-joint-state-publisher-gui \
   ros-humble-rviz2 \
-  ros-humble-teleop-twist-keyboard
+  ros-humble-teleop-twist-keyboard \
+  ros-humble-rqt-reconfigure
 pip install mujoco
 ```
 
@@ -194,6 +195,22 @@ Speed adjustment:
 | `e` / `c` | Increase / decrease angular speed only by 10% |
 
 Default speed is 0.5 m/s linear, 1.0 rad/s angular. `Ctrl-C` quits and publishes a zero-velocity command on exit.
+
+### Tune wheel controller gains live with rqt_reconfigure
+
+The wheel joints are driven by a velocity PID inside the MuJoCo hardware interface (gains defined in `src/m3pro_mujoco_sim/config/wheel_pids.yaml`). Those gains are exposed as ordinary ROS2 parameters on `/mujoco_ros2_control_node` and update live — no relaunch needed — so you can tune them interactively while driving the robot:
+
+```bash
+ros2 run rqt_reconfigure rqt_reconfigure
+```
+
+1. Select `/mujoco_ros2_control_node` from the node dropdown on the left.
+2. Expand `pid_gains > velocity > <joint_name>` for each of `lwheel1_joint`, `rwheel1_joint`, `lwheel2_joint`, `rwheel2_joint`.
+3. Drag the `p`, `i`, `d`, `u_clamp_max`, `u_clamp_min` sliders and watch the robot respond in real time — drive it with `teleop_twist_keyboard` (or `ros2 topic pub`, see above) in a third terminal while you adjust.
+4. Only the `velocity` block is functionally used (these joints are commanded through the velocity `command_interface`). The `position` block visible in the tree is an unused placeholder — see the comment in `wheel_pids.yaml` for why it needs to exist.
+5. Changes made in `rqt_reconfigure` are runtime-only. Once you find values you like, copy them back into `wheel_pids.yaml` so they persist across relaunches.
+
+If `p` is too low the base will feel sluggish and slow to reach commanded speed; if it's too high you may see the wheels buzz/oscillate against the roller contact physics — back off `p` or add a small amount of `d` if that happens.
 
 ### View URDF in RViz (no simulation)
 

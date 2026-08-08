@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-joint-state-publisher-gui \
     ros-humble-rviz2 \
     ros-humble-teleop-twist-keyboard \
+    ros-humble-rqt-reconfigure \
     # MuJoCo ros2_control integration
     ros-humble-mujoco-ros2-control \
     # Build tools

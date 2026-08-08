@@ -19,8 +19,11 @@ def generate_launch_description():
     robot_description_file = os.path.join(
         description_pkg, 'urdf', 'm3pro.urdf'
     )
+    wheel_pids_file = os.path.join(sim_pkg, 'config', 'wheel_pids.yaml')
     with open(robot_description_file, 'r') as f:
-        robot_description_content = f.read()
+        robot_description_content = f.read().replace(
+            '$(find m3pro_mujoco_sim)/config/wheel_pids.yaml', wheel_pids_file
+        )
 
     mjcf_dir = os.path.join(description_pkg, 'mjcf', '')
     controllers_file = os.path.join(sim_pkg, 'config', 'controllers.yaml')

@@ -54,7 +54,8 @@
       <geom name="base_visual" type="mesh" mesh="base_link" class="visual"
             material="black_aluminum"/>
       <geom name="base_collision" type="box" class="collision"
-            pos="-0.005 0 0.09" size="0.12 0.09 0.06"/>
+            pos="-0.005 0 0.09" size="0.12 0.09 0.06"
+            contype="1" conaffinity="0"/>
 
       <geom name="arm_base_visual" type="mesh" mesh="arm_base_Link" class="visual"
             pos="0.033617 -1.0031e-05 0" quat="1 3.18755e-05 0 0"
@@ -71,19 +72,187 @@
               material="black_rubber"/>
         <geom name="lwheel1_collision" type="cylinder" size="0.04 0.0275"
               pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+              contype="1" conaffinity="0"/>
+      <body name="lwheel1_roller_0_link" pos="0.0138115 0.00370079 0.0109">
+        <joint name="lwheel1_slipping_0_joint" type="hinge" pos="0 0 0" axis="-0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_0_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_1_link" pos="0.0101107 0.0101107 0.0109">
+        <joint name="lwheel1_slipping_1_joint" type="hinge" pos="0 0 0" axis="-0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_1_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_2_link" pos="0.00370079 0.0138115 0.0109">
+        <joint name="lwheel1_slipping_2_joint" type="hinge" pos="0 0 0" axis="-0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_2_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_3_link" pos="-0.00370079 0.0138115 0.0109">
+        <joint name="lwheel1_slipping_3_joint" type="hinge" pos="0 0 0" axis="-0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_3_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_4_link" pos="-0.0101107 0.0101107 0.0109">
+        <joint name="lwheel1_slipping_4_joint" type="hinge" pos="0 0 0" axis="-0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_4_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_5_link" pos="-0.0138115 0.00370079 0.0109">
+        <joint name="lwheel1_slipping_5_joint" type="hinge" pos="0 0 0" axis="-0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_5_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_6_link" pos="-0.0138115 -0.00370079 0.0109">
+        <joint name="lwheel1_slipping_6_joint" type="hinge" pos="0 0 0" axis="0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_6_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_7_link" pos="-0.0101107 -0.0101107 0.0109">
+        <joint name="lwheel1_slipping_7_joint" type="hinge" pos="0 0 0" axis="0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_7_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_8_link" pos="-0.00370079 -0.0138115 0.0109">
+        <joint name="lwheel1_slipping_8_joint" type="hinge" pos="0 0 0" axis="0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_8_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_9_link" pos="0.00370079 -0.0138115 0.0109">
+        <joint name="lwheel1_slipping_9_joint" type="hinge" pos="0 0 0" axis="0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_9_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_10_link" pos="0.0101107 -0.0101107 0.0109">
+        <joint name="lwheel1_slipping_10_joint" type="hinge" pos="0 0 0" axis="0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_10_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel1_roller_11_link" pos="0.0138115 -0.00370079 0.0109">
+        <joint name="lwheel1_slipping_11_joint" type="hinge" pos="0 0 0" axis="0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel1_roller_11_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
       </body>
 
       <!-- Front-right wheel -->
       <body name="rwheel1" pos="0.0775754 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
         <inertial pos="0 0 0.0109" mass="0.0973"
                   diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
-        <joint name="rwheel1_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+        <joint name="rwheel1_joint" type="hinge" axis="0 0 1" damping="0.05" armature="0.005"/>
         <geom name="rwheel1_visual" type="mesh" mesh="rwheel1" class="visual"
               material="black_rubber"/>
         <geom name="rwheel1_collision" type="cylinder" size="0.04 0.0275"
               pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+              contype="1" conaffinity="0"/>
+      <body name="rwheel1_roller_0_link" pos="0.0138115 -0.00370079 0.0109">
+        <joint name="rwheel1_slipping_0_joint" type="hinge" pos="0 0 0" axis="-0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_0_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_1_link" pos="0.0138115 0.00370079 0.0109">
+        <joint name="rwheel1_slipping_1_joint" type="hinge" pos="0 0 0" axis="0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_1_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_2_link" pos="0.0101107 0.0101107 0.0109">
+        <joint name="rwheel1_slipping_2_joint" type="hinge" pos="0 0 0" axis="0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_2_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_3_link" pos="0.00370079 0.0138115 0.0109">
+        <joint name="rwheel1_slipping_3_joint" type="hinge" pos="0 0 0" axis="0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_3_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_4_link" pos="-0.00370079 0.0138115 0.0109">
+        <joint name="rwheel1_slipping_4_joint" type="hinge" pos="0 0 0" axis="0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_4_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_5_link" pos="-0.0101107 0.0101107 0.0109">
+        <joint name="rwheel1_slipping_5_joint" type="hinge" pos="0 0 0" axis="0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_5_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_6_link" pos="-0.0138115 0.00370079 0.0109">
+        <joint name="rwheel1_slipping_6_joint" type="hinge" pos="0 0 0" axis="0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_6_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_7_link" pos="-0.0138115 -0.00370079 0.0109">
+        <joint name="rwheel1_slipping_7_joint" type="hinge" pos="0 0 0" axis="-0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_7_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_8_link" pos="-0.0101107 -0.0101107 0.0109">
+        <joint name="rwheel1_slipping_8_joint" type="hinge" pos="0 0 0" axis="-0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_8_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_9_link" pos="-0.00370079 -0.0138115 0.0109">
+        <joint name="rwheel1_slipping_9_joint" type="hinge" pos="0 0 0" axis="-0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_9_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_10_link" pos="0.00370079 -0.0138115 0.0109">
+        <joint name="rwheel1_slipping_10_joint" type="hinge" pos="0 0 0" axis="-0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_10_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel1_roller_11_link" pos="0.0101107 -0.0101107 0.0109">
+        <joint name="rwheel1_slipping_11_joint" type="hinge" pos="0 0 0" axis="-0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel1_roller_11_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
       </body>
 
       <!-- Rear-left wheel -->
@@ -95,19 +264,187 @@
               material="black_rubber"/>
         <geom name="lwheel2_collision" type="cylinder" size="0.04 0.0275"
               pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+              contype="1" conaffinity="0"/>
+      <body name="lwheel2_roller_0_link" pos="0.0138115 -0.00370079 0.0109">
+        <joint name="lwheel2_slipping_0_joint" type="hinge" pos="0 0 0" axis="-0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_0_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_1_link" pos="0.0138115 0.00370079 0.0109">
+        <joint name="lwheel2_slipping_1_joint" type="hinge" pos="0 0 0" axis="0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_1_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_2_link" pos="0.0101107 0.0101107 0.0109">
+        <joint name="lwheel2_slipping_2_joint" type="hinge" pos="0 0 0" axis="0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_2_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_3_link" pos="0.00370079 0.0138115 0.0109">
+        <joint name="lwheel2_slipping_3_joint" type="hinge" pos="0 0 0" axis="0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_3_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_4_link" pos="-0.00370079 0.0138115 0.0109">
+        <joint name="lwheel2_slipping_4_joint" type="hinge" pos="0 0 0" axis="0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_4_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_5_link" pos="-0.0101107 0.0101107 0.0109">
+        <joint name="lwheel2_slipping_5_joint" type="hinge" pos="0 0 0" axis="0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_5_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_6_link" pos="-0.0138115 0.00370079 0.0109">
+        <joint name="lwheel2_slipping_6_joint" type="hinge" pos="0 0 0" axis="0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_6_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_7_link" pos="-0.0138115 -0.00370079 0.0109">
+        <joint name="lwheel2_slipping_7_joint" type="hinge" pos="0 0 0" axis="-0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_7_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_8_link" pos="-0.0101107 -0.0101107 0.0109">
+        <joint name="lwheel2_slipping_8_joint" type="hinge" pos="0 0 0" axis="-0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_8_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_9_link" pos="-0.00370079 -0.0138115 0.0109">
+        <joint name="lwheel2_slipping_9_joint" type="hinge" pos="0 0 0" axis="-0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_9_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_10_link" pos="0.00370079 -0.0138115 0.0109">
+        <joint name="lwheel2_slipping_10_joint" type="hinge" pos="0 0 0" axis="-0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_10_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="lwheel2_roller_11_link" pos="0.0101107 -0.0101107 0.0109">
+        <joint name="lwheel2_slipping_11_joint" type="hinge" pos="0 0 0" axis="-0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="lwheel2_roller_11_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
       </body>
 
       <!-- Rear-right wheel -->
       <body name="rwheel2" pos="-0.0814246 -0.09775 0.04" quat="0.707107 -0.707107 0 0">
         <inertial pos="0 0 0.0109" mass="0.0973"
                   diaginertia="7.46e-05 4.45e-05 4.45e-05"/>
-        <joint name="rwheel2_joint" type="hinge" axis="0 0 -1" damping="0.05" armature="0.005"/>
+        <joint name="rwheel2_joint" type="hinge" axis="0 0 1" damping="0.05" armature="0.005"/>
         <geom name="rwheel2_visual" type="mesh" mesh="rwheel2" class="visual"
               material="black_rubber"/>
         <geom name="rwheel2_collision" type="cylinder" size="0.04 0.0275"
               pos="0 0 0.0109" class="collision"
-              condim="4" friction="1.0 0.3 0.001" priority="1"/>
+              contype="1" conaffinity="0"/>
+      <body name="rwheel2_roller_0_link" pos="0.0138115 0.00370079 0.0109">
+        <joint name="rwheel2_slipping_0_joint" type="hinge" pos="0 0 0" axis="-0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_0_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_1_link" pos="0.0101107 0.0101107 0.0109">
+        <joint name="rwheel2_slipping_1_joint" type="hinge" pos="0 0 0" axis="-0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_1_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_2_link" pos="0.00370079 0.0138115 0.0109">
+        <joint name="rwheel2_slipping_2_joint" type="hinge" pos="0 0 0" axis="-0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_2_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_3_link" pos="-0.00370079 0.0138115 0.0109">
+        <joint name="rwheel2_slipping_3_joint" type="hinge" pos="0 0 0" axis="-0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_3_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_4_link" pos="-0.0101107 0.0101107 0.0109">
+        <joint name="rwheel2_slipping_4_joint" type="hinge" pos="0 0 0" axis="-0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_4_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_5_link" pos="-0.0138115 0.00370079 0.0109">
+        <joint name="rwheel2_slipping_5_joint" type="hinge" pos="0 0 0" axis="-0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_5_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_6_link" pos="-0.0138115 -0.00370079 0.0109">
+        <joint name="rwheel2_slipping_6_joint" type="hinge" pos="0 0 0" axis="0.00198325 -0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_6_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_7_link" pos="-0.0101107 -0.0101107 0.0109">
+        <joint name="rwheel2_slipping_7_joint" type="hinge" pos="0 0 0" axis="0.00541833 -0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_7_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_8_link" pos="-0.00370079 -0.0138115 0.0109">
+        <joint name="rwheel2_slipping_8_joint" type="hinge" pos="0 0 0" axis="0.00740157 -0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_8_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_9_link" pos="0.00370079 -0.0138115 0.0109">
+        <joint name="rwheel2_slipping_9_joint" type="hinge" pos="0 0 0" axis="0.00740157 0.00198325 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_9_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_10_link" pos="0.0101107 -0.0101107 0.0109">
+        <joint name="rwheel2_slipping_10_joint" type="hinge" pos="0 0 0" axis="0.00541833 0.00541833 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_10_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
+      <body name="rwheel2_roller_11_link" pos="0.0138115 -0.00370079 0.0109">
+        <joint name="rwheel2_slipping_11_joint" type="hinge" pos="0 0 0" axis="0.00198325 0.00740157 0.0275"
+               damping="0.1" limited="false" actuatorfrclimited="false"/>
+        <inertial pos="0 0 0" mass="0.001" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom name="rwheel2_roller_11_geom" type="sphere" size="0.0251969"
+              contype="1" conaffinity="0" group="3" rgba="0.15 0.15 0.15 1"/>
+      </body>
       </body>
 
       <!-- Depth Camera -->
@@ -239,17 +576,6 @@
     </body>
   </worldbody>
 
-  <contact>
-    <pair geom1="lwheel1_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-    <pair geom1="rwheel1_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-    <pair geom1="lwheel2_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-    <pair geom1="rwheel2_collision" geom2="ground"
-          condim="4" friction="1.0 0.3 0.001 0.001 0.001"/>
-  </contact>
-
   <equality>
     <joint joint1="llink1_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
     <joint joint1="rlink2_joint" joint2="rlink1_joint" polycoef="0 1 0 0 0"/>
@@ -259,10 +585,10 @@
   </equality>
 
   <actuator>
-    <velocity name="fl_wheel_motor" joint="lwheel1_joint" kv="5" ctrlrange="-20 20"/>
-    <velocity name="fr_wheel_motor" joint="rwheel1_joint" kv="5" ctrlrange="-20 20"/>
-    <velocity name="rl_wheel_motor" joint="lwheel2_joint" kv="5" ctrlrange="-20 20"/>
-    <velocity name="rr_wheel_motor" joint="rwheel2_joint" kv="5" ctrlrange="-20 20"/>
+    <motor name="fl_wheel_motor" joint="lwheel1_joint" ctrlrange="-0.5 0.5"/>
+    <motor name="fr_wheel_motor" joint="rwheel1_joint" ctrlrange="-0.5 0.5"/>
+    <motor name="rl_wheel_motor" joint="lwheel2_joint" ctrlrange="-0.5 0.5"/>
+    <motor name="rr_wheel_motor" joint="rwheel2_joint" ctrlrange="-0.5 0.5"/>
 
     <position name="arm1_motor" joint="arm1_joint" kp="30" ctrlrange="-1.5708 1.5708"/>
     <position name="arm2_motor" joint="arm2_joint" kp="30" ctrlrange="-1.5708 1.5708"/>

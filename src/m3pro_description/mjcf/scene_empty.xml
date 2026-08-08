@@ -1,7 +1,7 @@
 <mujoco model="m3pro">
   <include file="m3pro_robot.xml"/>
 
-  <option timestep="0.002" gravity="0 0 -9.81" cone="elliptic"/>
+  <option timestep="0.002" gravity="0 0 -9.81"/>
 
   <visual>
     <global azimuth="135" elevation="-25"/>
@@ -19,7 +19,6 @@
     <light name="fill_light" pos="-2 2 2" dir="1 -1 -1" diffuse="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
     <camera name="tracking" pos="0.6 -0.8 0.5" xyaxes="0.8 0.6 0 -0.25 0.33 0.91" mode="trackcom"/>
 
-    <geom name="ground" type="plane" size="5 5 0.1" material="groundplane"
-          condim="4" friction="1.0 0.5 0.01"/>
+    <geom name="ground" type="plane" size="5 5 0.1" material="groundplane"/>
   </worldbody>
 </mujoco>

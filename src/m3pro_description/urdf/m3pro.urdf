@@ -492,6 +492,10 @@
   <ros2_control name="mujoco_ros2_control" type="system">
     <hardware>
       <plugin>mujoco_ros2_control/MujocoSystemInterface</plugin>
+      <!-- Wheel joints use <motor> (effort) actuators in the MJCF, driven by a
+           velocity command_interface (from mecanum_drive_controller); this PID
+           config lets the hardware interface convert commanded velocity into effort. -->
+      <param name="pids_config_file">$(find m3pro_mujoco_sim)/config/wheel_pids.yaml</param>
     </hardware>
 
     <!-- Wheel joints: velocity command, position+velocity state -->
